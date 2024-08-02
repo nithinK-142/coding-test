@@ -3,23 +3,27 @@ import pencil from "../assets/pencil.svg";
 import axios from "axios";
 
 interface Bookdata {
-  bookcode: string;
-  booknamesa: string;
-  bookname: string;
-  sellingprice: string;
-  costprice: string;
+  BookCode: string;
+  BookNameSa: string;
+  BookNameEn: string;
+  ItemId: string;
+  SellingPrice: string;
+  Quantity: string;
 }
+
+const defaultFormData = {
+  BookCode: "",
+  BookNameSa: "",
+  BookNameEn: "",
+  ItemId: "",
+  SellingPrice: "",
+  Quantity: "",
+};
 
 export default function BookMaster() {
   const [bookData, setBookData] = useState<Bookdata[]>([]);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<Bookdata>({
-    bookcode: "",
-    booknamesa: "",
-    bookname: "",
-    sellingprice: "",
-    costprice: "",
-  });
+  const [formData, setFormData] = useState<Bookdata>(defaultFormData);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,22 +33,51 @@ export default function BookMaster() {
     });
   };
 
+  async function handleDelete(itemid: string) {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3000/deleteBookData/${itemid}`
+      );
+      fetchBookData();
+      console.log(response.data.message);
+      return response.data.message;
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
   const editBook = (book: Bookdata) => {
     setFormData(book);
   };
 
   const handleSave = async () => {
     const message = await saveBookData();
+    setFormData(defaultFormData);
     alert(message);
   };
 
   async function saveBookData() {
     try {
       setLoading(true);
+
       const response = await axios.post("http://localhost:3000/saveBookData", {
         formData,
       });
+
       return response.data.message;
+    } catch (error: any) {
+      setLoading(false);
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchBookData() {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:3000/getBookData");
+      setBookData(response.data);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -54,18 +87,6 @@ export default function BookMaster() {
   }
 
   useEffect(() => {
-    async function fetchBookData() {
-      try {
-        setLoading(true);
-        const response = await axios.get("http://localhost:3000/getBookData");
-        setBookData(response.data);
-      } catch (error) {
-        setLoading(false);
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchBookData();
   }, []);
 
@@ -82,7 +103,7 @@ export default function BookMaster() {
               <th scope="col" className="px-5 py-3">
                 Book Code
               </th>
-              <th scope="col" className="px-5 py-3">
+              <th scope="col" className="px-5 py-3 text-center">
                 Book Name
               </th>
               <th scope="col" className="px-5 py-3">
@@ -101,52 +122,52 @@ export default function BookMaster() {
               <td className="px-5 py-4">
                 <input
                   type="text"
-                  name="bookcode"
-                  value={formData.bookcode}
+                  name="BookCode"
+                  value={formData.BookCode}
                   onChange={handleInputChange}
-                  className="px-4 py-1 rounded-md border-2 border-gray-400"
+                  className="px-4 py-1 rounded-md border-2 border-gray-400 w-[80%]"
                 />
               </td>
               <td className="px-5 py-4">
                 <div className="flex space-x-2">
                   <input
                     type="text"
-                    name="booknamesa"
-                    value={formData.booknamesa}
+                    name="BookNameSa"
+                    value={formData.BookNameSa}
                     onChange={handleInputChange}
-                    className="px-4 py-1 rounded-md border-2 border-gray-400"
+                    className="px-4 py-1 rounded-md border-2 border-gray-400 w-full"
                   />
                   <input
                     type="text"
-                    name="bookname"
-                    value={formData.bookname}
+                    name="BookNameEn"
+                    value={formData.BookNameEn}
                     onChange={handleInputChange}
-                    className="px-4 py-1 rounded-md border-2 border-gray-400"
+                    className="px-4 py-1 rounded-md border-2 border-gray-400 w-full"
                   />
                 </div>
               </td>
               <td className="px-5 py-4">
                 <input
                   type="text"
-                  name="sellingprice"
-                  value={formData.sellingprice}
+                  name="SellingPrice"
+                  value={formData.SellingPrice}
                   onChange={handleInputChange}
-                  className="px-4 py-1 rounded-md border-2 border-gray-400"
+                  className="px-4 py-1 rounded-md border-2 border-gray-400 w-[90%]"
                 />
               </td>
               <td className="px-5 py-4">
                 <input
                   type="text"
-                  name="costprice"
-                  value={formData.costprice}
+                  name="Quantity"
+                  value={formData.Quantity}
                   onChange={handleInputChange}
-                  className="px-4 py-1 rounded-md border-2 border-gray-400"
+                  className="px-4 py-1 rounded-md border-2 border-gray-400 w-[90%]"
                 />
               </td>
               <td className="px-5 py-4">
                 <button
                   onClick={handleSave}
-                  className="px-2 py-1 bg-gray-300 rounded-md"
+                  className="px-2.5 py-1.5 bg-gray-300 rounded-md"
                 >
                   Save
                 </button>
@@ -156,12 +177,12 @@ export default function BookMaster() {
           <tbody className="floating-scrollbar">
             {bookData.map((book, index) => (
               <tr key={index} className="bg-white border-b">
-                <td className="px-5 py-4">{book.bookcode}</td>
+                <td className="px-5 py-4">{book.BookCode}</td>
                 <td className="px-5 py-4">
-                  {book.booknamesa} / {book.bookname}
+                  {book.BookNameSa} / {book.BookNameEn}
                 </td>
-                <td className="px-5 py-4">{book.sellingprice}</td>
-                <td className="px-5 py-4">{book.costprice}</td>
+                <td className="px-5 py-4">{book.SellingPrice}</td>
+                <td className="px-5 py-4">{book.Quantity}</td>
                 <td className="px-5 py-4">
                   <div className="flex items-center space-x-2 px-2">
                     <img
@@ -170,7 +191,12 @@ export default function BookMaster() {
                       onClick={() => editBook(book)}
                       className="h-6 cursor-pointer"
                     />
-                    <button className="text-xl">❌</button>
+                    <button
+                      onClick={() => handleDelete(book.ItemId)}
+                      className="text-xl"
+                    >
+                      ❌
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -181,104 +207,3 @@ export default function BookMaster() {
     </div>
   );
 }
-// import { useState } from "react";
-// import bookdata from "../assets/bookdata.json";
-// import pencil from "../assets/pencil.svg";
-
-// interface Bookdata {
-//   bookcode: number;
-//   booknamesa: string;
-//   bookname: string;
-//   sellingprice: number;
-//   costprice: number;
-// }
-// export default function BookMaster() {
-//   const [bookData, setBookData] = useState();
-//   return (
-//     <div>
-//       <h1 className="text-center text-2xl font-semibold py-6">Book Master</h1>
-
-//       <div className="relative overflow-x-auto">
-//         <table className="w-full text-sm text-left rtl:text-right text-black">
-//           <thead className="text-xs text-black uppercase bg-gray-300">
-//             <tr>
-//               <th scope="col" className="px-5 py-3">
-//                 Book Code
-//               </th>
-//               <th scope="col" className="px-5 py-3">
-//                 Book Name
-//               </th>
-//               <th scope="col" className="px-5 py-3">
-//                 Selling Price
-//               </th>
-//               <th scope="col" className="px-5 py-3">
-//                 Cost Price
-//               </th>
-//               <th scope="col" className="px-5 py-3">
-//                 Action
-//               </th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             <tr className="bg-white border-b">
-//               <td className="px-5 py-4">
-//                 <input
-//                   type="text"
-//                   className="px-4 py-1 rounded-md border-2 border-gray-400"
-//                 />
-//               </td>
-//               <td className="px-5 py-4 flex space-x-2">
-//                 <input
-//                   type="text"
-//                   className="px-4 py-1 rounded-md border-2 border-gray-400"
-//                 />
-//                 <input
-//                   type="text"
-//                   className="px-4 py-1 rounded-md border-2 border-gray-400"
-//                 />
-//               </td>
-//               <td className="px-5 py-4">
-//                 <input
-//                   type="text"
-//                   className="px-4 py-1 rounded-md border-2 border-gray-400"
-//                 />
-//               </td>
-//               <td className="px-5 py-4">
-//                 <input
-//                   type="text"
-//                   className="px-4 py-1 rounded-md border-2 border-gray-400"
-//                 />
-//               </td>
-
-//               <td className="px-5 py-4">
-//                 <button className="px-2 py-1 bg-gray-300 rounded-md">
-//                   save
-//                 </button>
-//               </td>
-//             </tr>
-//           </tbody>
-//           <tbody>
-//             {bookdata.map((book) => (
-//               <tr className="bg-white border-b">
-//                 <td className="px-5 py-4">{book.bookcode}</td>
-//                 <td className="px-5 py-4">{book.booknamesa}</td>
-//                 <td className="px-5 py-4">{book.bookname}</td>
-//                 <td className="px-5 py-4">{book.sellingprice}</td>
-//                 <td className="px-5 py-4">{book.quantity}</td>
-//                 <td className="px-5 py-4">
-//                   <div>
-//                     <img
-//                       src={pencil}
-//                       alt="Pencil"
-//                       className="h-10 cursor-pointer"
-//                     />
-//                   </div>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// }
