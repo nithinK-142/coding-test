@@ -1,8 +1,19 @@
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header";
+
 function App() {
+  const isAuthenticated = true;
   return (
-    <div>
-      <h1>React Guide</h1>
-    </div>
+    <>
+      {isAuthenticated ? (
+        <>
+          <Header />
+          <Outlet />
+        </>
+      ) : (
+        <Outlet />
+      )}
+    </>
   );
 }
 
