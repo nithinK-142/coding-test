@@ -5,14 +5,8 @@ function App() {
   const isAuthenticated = true;
   return (
     <>
-      {isAuthenticated ? (
-        <>
-          <Header />
-          <Outlet />
-        </>
-      ) : (
-        <Outlet />
-      )}
+      {isAuthenticated && <Header />}
+      <Outlet />
     </>
   );
 }
