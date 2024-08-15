@@ -73,6 +73,7 @@ export const deleteEmployee = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { f_userName, f_Pwd } = req.body;
+    console.log(f_userName, f_Pwd);
     const user: ILogin | null = await LoginModel.findOne({ f_userName });
 
     if (!user) {
