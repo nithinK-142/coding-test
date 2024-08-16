@@ -73,7 +73,6 @@ export const deleteEmployee = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { f_userName, f_Pwd } = req.body;
-    console.log(f_userName, f_Pwd);
     const user: ILogin | null = await LoginModel.findOne({ f_userName });
 
     if (!user) {
@@ -104,30 +103,3 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Login failed", error });
   }
 };
-
-// export const loginUser = async (req: Request, res: Response) => {
-//   try {
-//     const { f_userName, f_Pwd } = req.body;
-//     const user: ILogin | null = await LoginModel.findOne({ f_userName });
-
-//     if (!user) {
-//       return res.status(401).json({ message: "Invalid credentials" });
-//     }
-
-//     const isPasswordValid = await bcrypt.compare(f_Pwd, user.f_Pwd);
-
-//     if (!isPasswordValid) {
-//       return res.status(401).json({ message: "Invalid credentials" });
-//     }
-
-//     const token = jwt.sign(
-//       { userId: user._id, username: user.f_userName },
-//       process.env.JWT_SECRET || "your_jwt_secret",
-//       { expiresIn: "1h" }
-//     );
-
-//     res.status(200).json({ message: "Login successful", token });
-//   } catch (error) {
-//     res.status(500).json({ message: "Login failed", error });
-//   }
-// };

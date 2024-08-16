@@ -6,7 +6,7 @@ import {
   deleteEmployee,
   loginUser,
   getEmployee,
-} from "../controller/user.controller";
+} from "../controller/employee.controller";
 import {
   employeeValidation,
   validate,
