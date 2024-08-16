@@ -77,17 +77,29 @@ export default function EmployeeList() {
                     className="object-cover w-10 h-10 mx-auto rounded-full"
                   />
                 </td>
-                <td className="px-4 py-2 border-b">{employee.f_Name}</td>
-                <td className="px-4 py-2 border-b">{employee.f_Email}</td>
-                <td className="px-4 py-2 border-b">{employee.f_Mobile}</td>
-                <td className="px-4 py-2 border-b">{employee.f_Designation}</td>
-                <td className="px-4 py-2 border-b">{employee.f_gender}</td>
-                <td className="px-4 py-2 border-b">{employee.f_Course}</td>
-                <td className="px-4 py-2 border-b">
+                <td className="px-4 py-2 text-center border-b">
+                  {employee.f_Name}
+                </td>
+                <td className="px-4 py-2 text-center border-b">
+                  {employee.f_Email}
+                </td>
+                <td className="px-4 py-2 text-center border-b">
+                  {employee.f_Mobile}
+                </td>
+                <td className="px-4 py-2 text-center border-b">
+                  {employee.f_Designation}
+                </td>
+                <td className="px-4 py-2 text-center border-b">
+                  {employee.f_gender}
+                </td>
+                <td className="px-4 py-2 text-center border-b">
+                  {employee.f_Course}
+                </td>
+                <td className="px-4 py-2 text-center border-b">
                   {new Date(employee.f_Createdate).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-2 border-b">
-                  <div className="flex space-x-4">
+                  <div className="flex justify-center space-x-4">
                     <Link to={`/edit-employee/${employee.f_Id}`}>Edit</Link>
                     <button onClick={() => handleDelete(employee.f_Id)}>
                       Delete

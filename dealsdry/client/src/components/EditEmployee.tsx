@@ -80,10 +80,6 @@ export default function EditEmployee() {
       formData.append("f_Image_file", selectedFile);
     }
 
-    // formData.forEach((value, key) => {
-    //   console.log(`${key}: ${value}`);
-    // });
-
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/${id}`,

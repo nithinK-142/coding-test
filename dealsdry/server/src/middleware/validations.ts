@@ -19,6 +19,17 @@ export const employeeValidation = [
 
 export const createEmployeeValidation = [
   ...employeeValidation,
+  body("f_Image_file").custom((value, { req }) => {
+    if (req.file && !["image/jpeg", "image/png"].includes(req.file.mimetype)) {
+      throw new Error("Invalid file type. Only JPG and PNG are allowed.");
+    }
+    return true;
+  }),
+];
+
+export const editEmployeeValidation = [
+  ...employeeValidation,
+  body("f_Id").isNumeric().withMessage("Employee ID must be a number"),
   body("f_Image_file")
     .optional()
     .custom((value, { req }) => {
@@ -26,24 +37,6 @@ export const createEmployeeValidation = [
         req.file &&
         !["image/jpeg", "image/png"].includes(req.file.mimetype)
       ) {
-        throw new Error("Invalid file type. Only JPG and PNG are allowed.");
-      }
-      return true;
-    }),
-];
-
-export const editEmployeeValidation = [
-  ...createEmployeeValidation,
-  body("f_Id").isNumeric().withMessage("Employee ID must be a number"),
-  body("f_Image_file")
-    .notEmpty()
-    .withMessage("Image file is required")
-    .custom((value, { req }) => {
-      if (!req.file) {
-        throw new Error("Image file is required.");
-      }
-      const fileTypes = ["image/jpeg", "image/png"];
-      if (!fileTypes.includes(req.file.mimetype)) {
         throw new Error("Invalid file type. Only JPG and PNG are allowed.");
       }
       return true;
