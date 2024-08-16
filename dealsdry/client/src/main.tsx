@@ -14,16 +14,52 @@ import Home from "./components/Home.tsx";
 import EmployeeList from "./components/EmployeeList.tsx";
 import EditEmployee from "./components/EditEmployee.tsx";
 import CreateEmployee from "./components/CreateEmployee.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route path="" element={<Home />} />
+      <Route
+        path=""
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
       <Route path="login" element={<Login />} />
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="employees-list" element={<EmployeeList />} />
-      <Route path="create-employee" element={<CreateEmployee />} />
-      <Route path="edit-employee/:id" element={<EditEmployee />} />
+      <Route
+        path="dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="employees-list"
+        element={
+          <ProtectedRoute>
+            <EmployeeList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="create-employee"
+        element={
+          <ProtectedRoute>
+            <CreateEmployee />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="edit-employee/:id"
+        element={
+          <ProtectedRoute>
+            <EditEmployee />
+          </ProtectedRoute>
+        }
+      />
     </Route>
   )
 );

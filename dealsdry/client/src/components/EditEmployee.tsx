@@ -16,7 +16,7 @@ export default function EditEmployee() {
     async function getEmployeeDetails() {
       try {
         const { data } = await axios.get<IEmployee>(
-          `http://localhost:3001/api/v1/employees/${id}`
+          `${import.meta.env.VITE_API_URL}/${id}`
         );
         setEmployee(data);
         setSelectedCourses(data.f_Course.split(","));
@@ -110,8 +110,8 @@ export default function EditEmployee() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Edit Employee</h1>
+    <div className="container p-4 mx-auto">
+      <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block mb-2">
@@ -121,7 +121,7 @@ export default function EditEmployee() {
               name="f_Name"
               value={employee.f_Name}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded text-black"
+              className="w-full p-2 text-black border border-gray-300 rounded"
             />
           </label>
         </div>
@@ -134,7 +134,7 @@ export default function EditEmployee() {
               name="f_Email"
               value={employee.f_Email}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded text-black"
+              className="w-full p-2 text-black border border-gray-300 rounded"
             />
           </label>
         </div>
@@ -147,7 +147,7 @@ export default function EditEmployee() {
               name="f_Mobile"
               value={employee.f_Mobile}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded text-black"
+              className="w-full p-2 text-black border border-gray-300 rounded"
             />
           </label>
         </div>
@@ -159,7 +159,7 @@ export default function EditEmployee() {
               name="f_Designation"
               value={employee.f_Designation}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded text-black"
+              className="w-full p-2 text-black border border-gray-300 rounded"
             >
               <option value="HR">HR</option>
               <option value="Manager">Manager</option>
@@ -244,14 +244,14 @@ export default function EditEmployee() {
               type="file"
               accept=".jpg,.png"
               onChange={handleFileChange}
-              className="w-full p-2 border border-gray-300 rounded text-black"
+              className="w-full p-2 text-black border border-gray-300 rounded"
             />
           </label>
         </div>
 
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="px-4 py-2 text-white bg-blue-500 rounded"
         >
           Update
         </button>
@@ -302,13 +302,13 @@ export default function EditEmployee() {
 //   }
 
 //   return (
-//     <div className="container mx-auto p-4">
-//       <h1 className="text-2xl font-bold mb-4">Edit Employee</h1>
+//     <div className="container p-4 mx-auto">
+//       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
 //       <div className="flex items-center mb-4">
 //         <img
 //           src={employee.f_Image}
 //           alt={employee.f_Name}
-//           className="h-24 w-24 object-cover rounded-full mr-4"
+//           className="object-cover w-24 h-24 mr-4 rounded-full"
 //         />
 //         <div>
 //           <h2 className="text-xl font-semibold">{employee.f_Name}</h2>
