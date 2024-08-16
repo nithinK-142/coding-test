@@ -16,6 +16,18 @@ export const employeeValidation = [
     .isIn(["male", "female", "other"])
     .withMessage("Invalid gender"),
   body("f_Course").notEmpty().withMessage("Course is required"),
+  body("f_Image_file")
+    .optional()
+    .custom((value, { req }) => {
+      if (!req.file) {
+        throw new Error("Image file is required");
+      }
+      const fileTypes = ["image/jpeg", "image/png"];
+      if (!fileTypes.includes(req.file.mimetype)) {
+        throw new Error("Invalid file type. Only JPG and PNG are allowed.");
+      }
+      return true;
+    }),
 ];
 
 export const validate = (req: Request, res: Response, next: NextFunction) => {

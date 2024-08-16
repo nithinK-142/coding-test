@@ -39,6 +39,12 @@ export const editEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
+
+    if (req.file) {
+      const imagePath = `http://localhost:3001/public/temp/${req.file.filename}`;
+      updateData.f_Image = imagePath;
+    }
+
     const updatedEmployee = await EmployeeModel.findOneAndUpdate(
       { f_Id: id },
       updateData,

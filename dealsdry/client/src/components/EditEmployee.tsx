@@ -10,6 +10,7 @@ export default function EditEmployee() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function EditEmployee() {
     const file = e.target.files?.[0];
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       setSelectedFile(file);
+      setSelectedFileName(file.name);
     } else {
       alert("Only JPG/PNG files are allowed");
     }
@@ -61,28 +63,26 @@ export default function EditEmployee() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!employee) {
+      setError("No employee data available.");
+      return;
+    }
+
     const formData = new FormData();
-    if (employee) {
-      formData.append("f_Id", employee.f_Id.toString());
-      formData.append("f_Name", employee.f_Name);
-      formData.append("f_Email", employee.f_Email);
-      formData.append("f_Mobile", employee.f_Mobile);
-      formData.append("f_Designation", employee.f_Designation);
-      formData.append("f_gender", employee.f_gender);
-      formData.append("f_Course", selectedCourses.join(","));
-      if (selectedFile) {
-        formData.append("f_Image", selectedFile);
-      }
+    formData.append("f_Id", employee.f_Id.toString());
+    formData.append("f_Name", employee.f_Name);
+    formData.append("f_Email", employee.f_Email);
+    formData.append("f_Mobile", employee.f_Mobile);
+    formData.append("f_Designation", employee.f_Designation);
+    formData.append("f_gender", employee.f_gender);
+    formData.append("f_Course", selectedCourses.join(","));
+    if (selectedFile) {
+      formData.append("f_Image_file", selectedFile);
     }
 
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    console.log(formData);
     try {
-      await axios.put(
-        `http://localhost:3001/api/v1/employees/${id}`,
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/${id}`,
         formData,
         {
           headers: {
@@ -90,6 +90,7 @@ export default function EditEmployee() {
           },
         }
       );
+      console.log("Response:", response.data);
       navigate("/employees-list");
     } catch (error) {
       setError("Failed to update employee details.");
@@ -110,7 +111,7 @@ export default function EditEmployee() {
   }
 
   return (
-    <div className="container p-4 mx-auto">
+    <div className="flex flex-col items-center p-4">
       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -246,7 +247,12 @@ export default function EditEmployee() {
               onChange={handleFileChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
             />
-          </label>
+          </label>{" "}
+          {selectedFileName && (
+            <p className="text-sm text-gray-500">
+              Selected file: {selectedFileName}
+            </p>
+          )}
         </div>
 
         <button
@@ -259,78 +265,3 @@ export default function EditEmployee() {
     </div>
   );
 }
-
-// import axios from "axios";
-// import { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import { IEmployee } from "./EmployeeList";
-
-// export default function EditEmployee() {
-//   const { id } = useParams<{ id: string }>();
-//   const [employee, setEmployee] = useState<IEmployee | null>(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   async function getEmployeeDetails() {
-//     try {
-//       const { data } = await axios.get<IEmployee>(
-//         `http://localhost:3001/api/v1/employees/${id}`
-//       );
-//       setEmployee(data);
-//     } catch (error) {
-//       setError("Failed to fetch employee details.");
-//       console.error(error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-
-//   useEffect(() => {
-//     getEmployeeDetails();
-//   }, [id]);
-
-//   if (loading) {
-//     return <div>Loading...</div>;
-//   }
-
-//   if (error) {
-//     return <div>{error}</div>;
-//   }
-
-//   if (!employee) {
-//     return <div>No employee found.</div>;
-//   }
-
-//   return (
-//     <div className="container p-4 mx-auto">
-//       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
-//       <div className="flex items-center mb-4">
-//         <img
-//           src={employee.f_Image}
-//           alt={employee.f_Name}
-//           className="object-cover w-24 h-24 mr-4 rounded-full"
-//         />
-//         <div>
-//           <h2 className="text-xl font-semibold">{employee.f_Name}</h2>
-//           <p className="text-gray-600">{employee.f_Email}</p>
-//           <p className="text-gray-600">{employee.f_Mobile}</p>
-//         </div>
-//       </div>
-//       <div>
-//         <p>
-//           <strong>Designation:</strong> {employee.f_Designation}
-//         </p>
-//         <p>
-//           <strong>Gender:</strong> {employee.f_gender}
-//         </p>
-//         <p>
-//           <strong>Course:</strong> {employee.f_Course}
-//         </p>
-//         <p>
-//           <strong>Created Date:</strong>{" "}
-//           {new Date(employee.f_Createdate).toLocaleDateString()}
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }

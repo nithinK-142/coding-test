@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import { handleFaviconRequest } from "./middleware/favicon.middleware";
 import router from "./routes";
+import path from "path";
 
 const app = express();
 
@@ -12,6 +13,8 @@ app.use(express.json());
 app.use(handleFaviconRequest);
 
 app.use(router);
+
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 // db connection
 import dbConnect from "./config/db.config";
