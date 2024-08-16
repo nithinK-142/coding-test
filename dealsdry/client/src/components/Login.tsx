@@ -24,6 +24,7 @@ const Login = () => {
       );
       login(data.token, data.user.username);
     } catch (err) {
+      alert("invalid login details");
       setError("Invalid login details");
     }
   };

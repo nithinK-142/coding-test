@@ -8,9 +8,10 @@ import {
   getEmployee,
 } from "../controller/employee.controller";
 import {
-  employeeValidation,
   validate,
   loginValidation,
+  editEmployeeValidation,
+  createEmployeeValidation,
 } from "../middleware/validations";
 import { upload } from "../utils/upload";
 
@@ -20,16 +21,16 @@ router.get("/employees/:id", getEmployee);
 router.get("/employees", getEmployees);
 router.post(
   "/employees",
-  // employeeValidation,
-  // validate,
   upload.single("f_Image_file"),
+  createEmployeeValidation,
+  validate,
   createEmployee
 );
 router.put(
   "/employees/:id",
-  // employeeValidation,
-  // validate,
   upload.single("f_Image_file"),
+  editEmployeeValidation,
+  validate,
   editEmployee
 );
 router.delete("/employees/:id", deleteEmployee);
