@@ -27,10 +27,34 @@ export const getEmployees = async (req: Request, res: Response) => {
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const newEmployee: IEmployee = new EmployeeModel(req.body);
+    const { f_Name, f_Email, f_Mobile, f_Designation, f_gender, f_Course } =
+      req.body;
+    let imagePath: string | undefined;
+    if (req.file) {
+      imagePath = `http://localhost:3001/public/temp/${req.file.filename}`;
+    }
+    const lastEmployee = await EmployeeModel.findOne()
+      .sort({ f_Id: -1 })
+      .exec();
+
+    if (!lastEmployee) throw Error;
+
+    const newEmployee = new EmployeeModel({
+      f_Id: lastEmployee.f_Id + 1,
+      f_Name,
+      f_Email,
+      f_Mobile,
+      f_Designation,
+      f_gender,
+      f_Course,
+      f_Image: imagePath,
+    });
+
     const savedEmployee = await newEmployee.save();
+
     res.status(201).json(savedEmployee);
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message);
     res.status(500).json({ message: "Error creating employee", error });
   }
 };

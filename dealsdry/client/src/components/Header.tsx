@@ -14,9 +14,9 @@ export default function Header() {
   }, [navigate]);
 
   return (
-    <nav className="flex justify-between gap-40 px-20 py-6 outline">
+    <nav className="flex justify-between gap-40 px-20 py-6 border">
       <div className="flex justify-between w-1/3">
-        <Link to={"/"}>Home</Link>
+        <Link to={"/dashboard"}>Dashboard</Link>
         <Link to={"/employees-list"}>EmployeesList</Link>
       </div>
       <div className="1/2"></div>

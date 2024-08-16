@@ -18,7 +18,13 @@ const router = Router();
 
 router.get("/employees/:id", getEmployee);
 router.get("/employees", getEmployees);
-router.post("/employees", employeeValidation, validate, createEmployee);
+router.post(
+  "/employees",
+  // employeeValidation,
+  // validate,
+  upload.single("f_Image_file"),
+  createEmployee
+);
 router.put(
   "/employees/:id",
   // employeeValidation,
