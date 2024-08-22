@@ -1,11 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskList from "./components/TaskList";
-import { tasks } from "./constants/constants";
+import { tasks as initialTasks } from "./constants/constants";
 import { Task, TaskStatus } from "./constants/types";
 
 function App() {
-  const [taskList, setTaskList] = useState<Task[]>(tasks);
+  const [taskList, setTaskList] = useState<Task[]>([]);
   const [activeCard, setActiveCard] = useState<Task | null>(null);
+
+  useEffect(() => {
+    // localStorage.setItem("taskList", JSON.stringify(initialTasks));
+    const savedTasks = localStorage.getItem("taskList");
+    if (savedTasks) {
+      setTaskList(JSON.parse(savedTasks));
+    } else {
+      setTaskList(initialTasks);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("taskList", JSON.stringify(taskList));
+  }, [taskList]);
 
   function onDrop(newStatus: TaskStatus, newPosition: number) {
     if (activeCard !== null) {

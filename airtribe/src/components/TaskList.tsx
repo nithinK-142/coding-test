@@ -35,7 +35,7 @@ export default function TaskList({
       ))}
       <DropArea onDrop={() => onDrop(status, tasks.length)} />
 
-      <button className="font-thin py-2 px-4 rounded inline-flex items-center w-fit">
+      <button className="opacity-50 py-2 px-4 rounded inline-flex items-center w-fit">
         <Plus height={16} /> New
       </button>
     </div>

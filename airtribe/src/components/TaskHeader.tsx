@@ -17,9 +17,9 @@ export default function TaskHeader({
         <h2 className={`${colorClasses[color]} rounded-sm px-1.5 text-sm`}>
           {title}
         </h2>
-        <p className="ml-2">{tasks.length}</p>
+        <p className="ml-2 opacity-60">{tasks.length}</p>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center opacity-50">
         <Ellipsis />
         <Plus />
       </div>
