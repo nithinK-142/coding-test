@@ -14,7 +14,7 @@ export default function TaskCard({
       onDragStart={() => setActiveCard(task)}
       onDragEnd={() => setActiveCard(null)}
     >
-      <p className="">{task.text}</p>
+      <p className="text-left">{task.text}</p>
     </div>
   );
 }

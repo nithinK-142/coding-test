@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 import TaskList from "./components/TaskList";
 import { tasks as initialTasks } from "./constants/constants";
 import { Task, TaskStatus } from "./constants/types";
+import { v4 as uuidv4 } from "uuid";
 
-function App() {
+export default function App() {
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [activeCard, setActiveCard] = useState<Task | null>(null);
+  const [newTaskTexts, setNewTaskTexts] = useState<Record<TaskStatus, string>>({
+    notStarted: "",
+    inProgress: "",
+    completed: "",
+  });
 
   useEffect(() => {
     // localStorage.setItem("taskList", JSON.stringify(initialTasks));
@@ -20,6 +26,19 @@ function App() {
   useEffect(() => {
     localStorage.setItem("taskList", JSON.stringify(taskList));
   }, [taskList]);
+
+  function handleAddTask(status: TaskStatus) {
+    if (newTaskTexts[status].trim() === "") return;
+
+    const newTask: Task = {
+      id: uuidv4(),
+      text: newTaskTexts[status],
+      status,
+    };
+
+    setTaskList([...taskList, newTask]);
+    setNewTaskTexts((prev) => ({ ...prev, [status]: "" }));
+  }
 
   function onDrop(newStatus: TaskStatus, newPosition: number) {
     if (activeCard !== null) {
@@ -41,6 +60,11 @@ function App() {
           tasks={taskList.filter((task) => task.status === "notStarted")}
           setActiveCard={setActiveCard}
           onDrop={onDrop}
+          addTask={handleAddTask}
+          newTaskText={newTaskTexts["notStarted"]}
+          setNewTaskText={(text: string) =>
+            setNewTaskTexts((prev) => ({ ...prev, ["notStarted"]: text }))
+          }
         />
         <TaskList
           title="In Progress"
@@ -49,6 +73,11 @@ function App() {
           tasks={taskList.filter((task) => task.status === "inProgress")}
           setActiveCard={setActiveCard}
           onDrop={onDrop}
+          addTask={handleAddTask}
+          newTaskText={newTaskTexts["inProgress"]}
+          setNewTaskText={(text: string) =>
+            setNewTaskTexts((prev) => ({ ...prev, ["inProgress"]: text }))
+          }
         />
         <TaskList
           title="Completed"
@@ -57,10 +86,13 @@ function App() {
           tasks={taskList.filter((task) => task.status === "completed")}
           setActiveCard={setActiveCard}
           onDrop={onDrop}
+          addTask={handleAddTask}
+          newTaskText={newTaskTexts["completed"]}
+          setNewTaskText={(text: string) =>
+            setNewTaskTexts((prev) => ({ ...prev, ["completed"]: text }))
+          }
         />
       </div>
     </main>
   );
 }
-
-export default App;
