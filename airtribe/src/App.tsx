@@ -43,7 +43,29 @@ export default function App() {
   function onDrop(newStatus: TaskStatus, newPosition: number) {
     if (activeCard !== null) {
       const updatedTasks = taskList.filter((task) => task.id !== activeCard.id);
-      updatedTasks.splice(newPosition, 0, { ...activeCard, status: newStatus });
+      const tasksInNewStatus = updatedTasks.filter(
+        (task) => task.status === newStatus
+      );
+
+      // Adjust newPosition if it's at the end of the list
+      const adjustedPosition =
+        newPosition > tasksInNewStatus.length
+          ? tasksInNewStatus.length
+          : newPosition;
+
+      // Find the index to insert in the overall list
+      const insertIndex = updatedTasks.findIndex((task, index) => {
+        return task.status === newStatus && index === adjustedPosition;
+      });
+
+      // If no matching index found, append to the end of the status group
+      const finalInsertIndex =
+        insertIndex === -1 ? updatedTasks.length : insertIndex;
+
+      updatedTasks.splice(finalInsertIndex, 0, {
+        ...activeCard,
+        status: newStatus,
+      });
       setTaskList(updatedTasks);
       setActiveCard(null);
     }
