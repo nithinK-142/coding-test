@@ -3,6 +3,8 @@ import TaskList from "./components/TaskList";
 import { tasks as initialTasks } from "./constants/constants";
 import { Task, TaskStatus } from "./constants/types";
 import { v4 as uuidv4 } from "uuid";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import TaskDetail from "./components/TaskDetail";
 
 export default function App() {
   const [taskList, setTaskList] = useState<Task[]>([]);
@@ -29,7 +31,6 @@ export default function App() {
 
   function handleAddTask(status: TaskStatus) {
     if (newTaskTexts[status].trim() === "") return;
-
     const newTask: Task = {
       id: uuidv4(),
       text: newTaskTexts[status],
@@ -38,6 +39,16 @@ export default function App() {
 
     setTaskList([...taskList, newTask]);
     setNewTaskTexts((prev) => ({ ...prev, [status]: "" }));
+  }
+
+  function updateTask(updatedTask: Task) {
+    setTaskList(
+      taskList.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+  }
+
+  function deleteTask(id: string) {
+    setTaskList(taskList.filter((task) => task.id !== id));
   }
 
   function onDrop(newStatus: TaskStatus, newPosition: number) {
@@ -71,9 +82,8 @@ export default function App() {
     }
   }
 
-  return (
-    <main className="flex flex-col items-center text-center">
-      <h1 className="text-xl font-semibold my-6">Airtribe</h1>
+  const TaskListComponent = () => {
+    return (
       <div className="flex space-x-8">
         <TaskList
           title="Not Started"
@@ -115,6 +125,27 @@ export default function App() {
           }
         />
       </div>
-    </main>
+    );
+  };
+
+  return (
+    <BrowserRouter>
+      <main className="flex flex-col items-center text-center">
+        <h1 className="text-xl font-semibold my-6">Airtribe</h1>
+        <Routes>
+          <Route path="/" element={<TaskListComponent />} />
+          <Route
+            path="/task/:id"
+            element={
+              <TaskDetail
+                tasks={taskList}
+                updateTask={updateTask}
+                deleteTask={deleteTask}
+              />
+            }
+          />
+        </Routes>
+      </main>
+    </BrowserRouter>
   );
 }
