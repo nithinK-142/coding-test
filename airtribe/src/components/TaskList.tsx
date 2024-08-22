@@ -28,9 +28,12 @@ export default function TaskList({
       {tasks.map((task, index) => (
         <React.Fragment key={task.id}>
           <TaskCard task={task} setActiveCard={setActiveCard} />
-          <DropArea onDrop={() => onDrop(status, index + 1)} />
+          {index < tasks.length - 1 && (
+            <DropArea onDrop={() => onDrop(status, index + 1)} />
+          )}
         </React.Fragment>
       ))}
+      <DropArea onDrop={() => onDrop(status, tasks.length)} />
 
       <button className="font-thin py-2 px-4 rounded inline-flex items-center w-fit">
         <Plus height={16} /> New

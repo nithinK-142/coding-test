@@ -1,35 +1,35 @@
-import { Task, TaskStatus } from "./types";
+import { Task } from "./types";
 
 export const tasks: Task[] = [
   {
     id: 1,
     text: "Complete project proposal",
-    status: "notStarted" as TaskStatus,
+    status: "notStarted",
   },
   {
     id: 2,
     text: "Review client feedback",
-    status: "inProgress" as TaskStatus,
+    status: "inProgress",
   },
   {
     id: 3,
     text: "Update website content",
-    status: "completed" as TaskStatus,
+    status: "completed",
   },
   {
     id: 4,
     text: "Prepare presentation slides",
-    status: "notStarted" as TaskStatus,
+    status: "notStarted",
   },
   {
     id: 5,
     text: "Schedule team meeting",
-    status: "inProgress" as TaskStatus,
+    status: "inProgress",
   },
   {
     id: 6,
     text: "Send progress report",
-    status: "completed" as TaskStatus,
+    status: "completed",
   },
 ];
 
