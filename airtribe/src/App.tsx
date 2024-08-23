@@ -21,7 +21,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("taskList", JSON.stringify(taskList));
+    if (taskList.length > 0) {
+      localStorage.setItem("taskList", JSON.stringify(taskList));
+    }
   }, [taskList]);
 
   function handleAddTask(status: TaskStatus, text: string) {
