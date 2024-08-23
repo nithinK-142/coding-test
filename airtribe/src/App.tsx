@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import TaskList from "./components/TaskList";
-import { tasks as initialTasks } from "./constants/constants";
+// import { tasks as initialTasks } from "./constants/constants";
 import { Task, TaskStatus } from "./constants/types";
 import { v4 as uuidv4 } from "uuid";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TaskDetail from "./components/TaskDetail";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 export default function App() {
-  const [taskList, setTaskList] = useState<Task[]>([]);
+  const [taskList, setTaskList] = useLocalStorage<Task[]>("taskList", []);
+  // const [taskList, setTaskList] = useLocalStorage<Task[]>("taskList", initialTasks);
   const [activeCard, setActiveCard] = useState<Task | null>(null);
 
   useEffect(() => {
@@ -15,8 +17,9 @@ export default function App() {
     if (savedTasks) {
       setTaskList(JSON.parse(savedTasks));
     } else {
-      setTaskList(initialTasks);
-      localStorage.setItem("taskList", JSON.stringify(initialTasks));
+      setTaskList([]);
+      // setTaskList(initialTasks);
+      // localStorage.setItem("taskList", JSON.stringify(initialTasks));
     }
   }, []);
 
