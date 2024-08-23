@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { TaskStatus, TaskColor, Task } from "@/constants/types";
 import { Plus } from "lucide-react";
 import TaskCard from "./TaskCard";
@@ -24,18 +24,23 @@ export default function TaskList({
 }) {
   const [showInput, setShowInput] = useState(false);
   const [newTaskText, setNewTaskText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleNewClick = useCallback(() => {
     setShowInput(true);
   }, []);
 
-  const handleAddTask = useCallback(() => {
-    if (newTaskText.trim() !== "") {
-      addTask(status, newTaskText);
-      setNewTaskText("");
-      setShowInput(false);
-    }
-  }, [addTask, newTaskText, status]);
+  const handleAddTask = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (newTaskText.trim() !== "") {
+        addTask(status, newTaskText);
+        setNewTaskText("");
+        setShowInput(false);
+      }
+    },
+    [addTask, newTaskText, status]
+  );
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +48,12 @@ export default function TaskList({
     },
     []
   );
+
+  useEffect(() => {
+    if (showInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showInput]);
 
   return (
     <div className="flex flex-col w-[20rem] p-2 rounded-md">
@@ -60,21 +71,16 @@ export default function TaskList({
       <DropArea onDrop={() => onDrop(status, tasks.length)} />
 
       {showInput && (
-        <div>
+        <form onSubmit={handleAddTask}>
           <input
+            ref={inputRef}
             type="text"
             value={newTaskText}
             onChange={handleInputChange}
             placeholder="Enter a new task"
             className="border rounded px-2 py-1.5 w-full text-black"
           />
-          <button
-            onClick={handleAddTask}
-            className="mt-2 bg-blue-500 text-white py-1 px-2 rounded"
-          >
-            Add Task
-          </button>
-        </div>
+        </form>
       )}
       {!showInput && (
         <button
