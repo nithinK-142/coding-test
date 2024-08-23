@@ -9,19 +9,14 @@ import TaskDetail from "./components/TaskDetail";
 export default function App() {
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [activeCard, setActiveCard] = useState<Task | null>(null);
-  const [newTaskTexts, setNewTaskTexts] = useState<Record<TaskStatus, string>>({
-    notStarted: "",
-    inProgress: "",
-    completed: "",
-  });
 
   useEffect(() => {
-    // localStorage.setItem("taskList", JSON.stringify(initialTasks));
     const savedTasks = localStorage.getItem("taskList");
     if (savedTasks) {
       setTaskList(JSON.parse(savedTasks));
     } else {
       setTaskList(initialTasks);
+      localStorage.setItem("taskList", JSON.stringify(initialTasks));
     }
   }, []);
 
@@ -29,16 +24,14 @@ export default function App() {
     localStorage.setItem("taskList", JSON.stringify(taskList));
   }, [taskList]);
 
-  function handleAddTask(status: TaskStatus) {
-    if (newTaskTexts[status].trim() === "") return;
+  function handleAddTask(status: TaskStatus, text: string) {
     const newTask: Task = {
       id: uuidv4(),
-      text: newTaskTexts[status],
+      text: text,
       status,
     };
 
     setTaskList([...taskList, newTask]);
-    setNewTaskTexts((prev) => ({ ...prev, [status]: "" }));
   }
 
   function updateTask(updatedTask: Task) {
@@ -93,10 +86,6 @@ export default function App() {
           setActiveCard={setActiveCard}
           onDrop={onDrop}
           addTask={handleAddTask}
-          newTaskText={newTaskTexts["notStarted"]}
-          setNewTaskText={(text: string) =>
-            setNewTaskTexts((prev) => ({ ...prev, ["notStarted"]: text }))
-          }
         />
         <TaskList
           title="In Progress"
@@ -106,10 +95,6 @@ export default function App() {
           setActiveCard={setActiveCard}
           onDrop={onDrop}
           addTask={handleAddTask}
-          newTaskText={newTaskTexts["inProgress"]}
-          setNewTaskText={(text: string) =>
-            setNewTaskTexts((prev) => ({ ...prev, ["inProgress"]: text }))
-          }
         />
         <TaskList
           title="Completed"
@@ -119,10 +104,6 @@ export default function App() {
           setActiveCard={setActiveCard}
           onDrop={onDrop}
           addTask={handleAddTask}
-          newTaskText={newTaskTexts["completed"]}
-          setNewTaskText={(text: string) =>
-            setNewTaskTexts((prev) => ({ ...prev, ["completed"]: text }))
-          }
         />
       </div>
     );

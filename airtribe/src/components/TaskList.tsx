@@ -1,9 +1,9 @@
+import React, { useState, useCallback } from "react";
 import { TaskStatus, TaskColor, Task } from "@/constants/types";
 import { Plus } from "lucide-react";
 import TaskCard from "./TaskCard";
 import TaskHeader from "./TaskHeader";
 import DropArea from "./DropArea";
-import React, { useState } from "react";
 
 export default function TaskList({
   title,
@@ -13,8 +13,6 @@ export default function TaskList({
   setActiveCard,
   onDrop,
   addTask,
-  newTaskText,
-  setNewTaskText,
 }: {
   title: string;
   status: TaskStatus;
@@ -22,20 +20,29 @@ export default function TaskList({
   tasks: Task[];
   setActiveCard: (task: Task | null) => void;
   onDrop: (status: TaskStatus, position: number) => void;
-  addTask: (status: TaskStatus) => void;
-  newTaskText: string;
-  setNewTaskText: (text: string) => void;
+  addTask: (status: TaskStatus, text: string) => void;
 }) {
   const [showInput, setShowInput] = useState(false);
+  const [newTaskText, setNewTaskText] = useState("");
 
-  const handleNewClick = () => {
+  const handleNewClick = useCallback(() => {
     setShowInput(true);
-  };
+  }, []);
 
-  const handleAddTask = () => {
-    addTask(status);
-    setShowInput(false);
-  };
+  const handleAddTask = useCallback(() => {
+    if (newTaskText.trim() !== "") {
+      addTask(status, newTaskText);
+      setNewTaskText("");
+      setShowInput(false);
+    }
+  }, [addTask, newTaskText, status]);
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewTaskText(e.target.value);
+    },
+    []
+  );
 
   return (
     <div className="flex flex-col w-[20rem] p-2 rounded-md">
@@ -57,7 +64,7 @@ export default function TaskList({
           <input
             type="text"
             value={newTaskText}
-            onChange={(e) => setNewTaskText(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Enter a new task"
             className="border rounded px-2 py-1.5 w-full text-black"
           />
