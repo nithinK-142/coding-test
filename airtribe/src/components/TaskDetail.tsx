@@ -79,7 +79,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             <option value="completed">Completed</option>
           </select>
         </div>
-        <div className="flex justify-between">
+        <div className="flex justify-between space-x-1">
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded"
