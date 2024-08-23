@@ -11,6 +11,9 @@ export default function App() {
   const [taskList, setTaskList] = useLocalStorage<Task[]>("taskList", []);
   // const [taskList, setTaskList] = useLocalStorage<Task[]>("taskList", initialTasks);
   const [activeCard, setActiveCard] = useState<Task | null>(null);
+  const [openInputStatus, setOpenInputStatus] = useState<TaskStatus | null>(
+    null
+  );
 
   useEffect(() => {
     const savedTasks = localStorage.getItem("taskList");
@@ -91,6 +94,8 @@ export default function App() {
           setActiveCard={setActiveCard}
           onDrop={onDrop}
           addTask={handleAddTask}
+          openInputStatus={openInputStatus}
+          setOpenInputStatus={setOpenInputStatus}
         />
         <TaskList
           title="In Progress"
@@ -100,6 +105,8 @@ export default function App() {
           setActiveCard={setActiveCard}
           onDrop={onDrop}
           addTask={handleAddTask}
+          openInputStatus={openInputStatus}
+          setOpenInputStatus={setOpenInputStatus}
         />
         <TaskList
           title="Completed"
@@ -109,6 +116,8 @@ export default function App() {
           setActiveCard={setActiveCard}
           onDrop={onDrop}
           addTask={handleAddTask}
+          openInputStatus={openInputStatus}
+          setOpenInputStatus={setOpenInputStatus}
         />
       </div>
     );

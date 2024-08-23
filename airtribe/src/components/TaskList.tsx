@@ -13,6 +13,8 @@ export default function TaskList({
   setActiveCard,
   onDrop,
   addTask,
+  openInputStatus,
+  setOpenInputStatus,
 }: {
   title: string;
   status: TaskStatus;
@@ -21,14 +23,15 @@ export default function TaskList({
   setActiveCard: (task: Task | null) => void;
   onDrop: (status: TaskStatus, position: number) => void;
   addTask: (status: TaskStatus, text: string) => void;
+  openInputStatus: TaskStatus | null;
+  setOpenInputStatus: (status: TaskStatus | null) => void;
 }) {
-  const [showInput, setShowInput] = useState(false);
   const [newTaskText, setNewTaskText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleNewClick = useCallback(() => {
-    setShowInput(true);
-  }, []);
+    setOpenInputStatus(status);
+  }, [setOpenInputStatus, status]);
 
   const handleAddTask = useCallback(
     (e: React.FormEvent) => {
@@ -36,10 +39,10 @@ export default function TaskList({
       if (newTaskText.trim() !== "") {
         addTask(status, newTaskText);
         setNewTaskText("");
-        setShowInput(false);
+        setOpenInputStatus(null);
       }
     },
-    [addTask, newTaskText, status]
+    [addTask, newTaskText, status, setOpenInputStatus]
   );
 
   const handleInputChange = useCallback(
@@ -50,10 +53,12 @@ export default function TaskList({
   );
 
   useEffect(() => {
-    if (showInput && inputRef.current) {
+    if (openInputStatus === status && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [showInput]);
+  }, [openInputStatus, status]);
+
+  const isInputOpen = openInputStatus === status;
 
   return (
     <div className="flex flex-col w-[20rem] p-2 rounded-md">
@@ -70,7 +75,7 @@ export default function TaskList({
       ))}
       <DropArea onDrop={() => onDrop(status, tasks.length)} />
 
-      {showInput && (
+      {isInputOpen && (
         <form onSubmit={handleAddTask}>
           <input
             ref={inputRef}
@@ -82,7 +87,7 @@ export default function TaskList({
           />
         </form>
       )}
-      {!showInput && (
+      {!isInputOpen && (
         <button
           onClick={handleNewClick}
           className="opacity-50 py-2 px-4 rounded inline-flex items-center w-fit mt-2"
