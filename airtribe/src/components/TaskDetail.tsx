@@ -3,17 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Task, TaskStatus } from "@/constants/types";
 import NotFound from "./NotFound";
 
-type TaskDetailProps = {
-  tasks: Task[];
-  updateTask: (updatedTask: Task) => void;
-  deleteTask: (id: string) => void;
-};
-
-const TaskDetail: React.FC<TaskDetailProps> = ({
+export default function TaskDetail({
   tasks,
   updateTask,
   deleteTask,
-}) => {
+}: {
+  tasks: Task[];
+  updateTask: (updatedTask: Task) => void;
+  deleteTask: (id: string) => void;
+}) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -96,6 +94,4 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       </form>
     </div>
   );
-};
-
-export default TaskDetail;
+}

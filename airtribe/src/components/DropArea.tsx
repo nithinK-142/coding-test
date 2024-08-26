@@ -1,11 +1,6 @@
-import { TaskStatus } from "@/constants/types";
 import { useState } from "react";
 
-export default function DropArea({
-  onDrop,
-}: {
-  onDrop: (status?: TaskStatus, position?: number) => void;
-}) {
+export default function DropArea({ onDrop }: { onDrop: () => void }) {
   const [isOver, setIsOver] = useState(false);
   return (
     <section
