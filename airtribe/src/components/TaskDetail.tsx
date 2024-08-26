@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Task, TaskStatus } from "@/constants/types";
+import NotFound from "./NotFound";
 
 type TaskDetailProps = {
   tasks: Task[];
@@ -33,9 +34,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     }
   }, [id, tasks]);
 
-  if (!task) {
-    return <div>Task not found</div>;
-  }
+  if (!task) return <NotFound />;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

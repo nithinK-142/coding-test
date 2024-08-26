@@ -80,6 +80,7 @@ export default function TaskList({
           <input
             ref={inputRef}
             type="text"
+            name="newTaskText"
             value={newTaskText}
             onChange={handleInputChange}
             placeholder="Enter a new task"
