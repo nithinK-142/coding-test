@@ -35,7 +35,7 @@ export default function App() {
   function handleAddTask(status: TaskStatus, text: string) {
     const newTask: Task = {
       id: uuidv4(),
-      text: text,
+      text,
       status,
     };
 

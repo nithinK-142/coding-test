@@ -83,6 +83,7 @@ export default function TaskList({
             name="newTaskText"
             value={newTaskText}
             onChange={handleInputChange}
+            onBlur={() => setOpenInputStatus(null)}
             placeholder="Enter a new task"
             className="border rounded px-2 py-1.5 w-full text-black"
           />
