@@ -54,7 +54,10 @@ export default function App() {
 
   function onDrop(newStatus: TaskStatus, newPosition: number) {
     if (activeCard !== null) {
+      // Remove the dragged task from the current task list
       const updatedTasks = taskList.filter((task) => task.id !== activeCard.id);
+
+      // Find tasks in the new status
       const tasksInNewStatus = updatedTasks.filter(
         (task) => task.status === newStatus
       );
@@ -83,7 +86,7 @@ export default function App() {
     }
   }
 
-  const TaskListComponent = () => {
+  function TaskListComponent() {
     return (
       <div className="flex space-x-8">
         <TaskList
@@ -121,7 +124,7 @@ export default function App() {
         />
       </div>
     );
-  };
+  }
 
   return (
     <BrowserRouter>
