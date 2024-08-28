@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { IEmployee } from "./EmployeeList";
-// import { COURSE_LIST } from "@/constants/cources";
 
 export default function EditEmployee() {
   const { id } = useParams<{ id: string }>();
@@ -22,8 +21,8 @@ export default function EditEmployee() {
         const { data } = await axios.get(
           `http://localhost:3001/api/v1/courses`
         );
-        console.log(data[0].courses);
-        setCourses(data[0].courses.split(","));
+        console.log(data.courses);
+        setCourses(data.courses);
       } catch (error) {
         console.error(error);
         setError("Failed to add course");
