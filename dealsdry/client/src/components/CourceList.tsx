@@ -81,10 +81,13 @@ export default function CourseList() {
               key={index}
               className="flex items-center justify-between p-2 border rounded-md"
             >
-              <span>{course.trim()}</span>
+              <div>
+                <span className="mr-2">{index + 1}</span>
+                <span>{course.trim()}</span>
+              </div>
               <button
                 onClick={() => deleteCourse(course.trim())}
-                className="p-1 text-gray-700 bg-red-400 rounded-md"
+                className="p-1 text-white bg-red-500 rounded-md"
               >
                 Delete
               </button>

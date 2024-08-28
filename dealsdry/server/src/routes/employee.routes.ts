@@ -14,11 +14,6 @@ import {
   createEmployeeValidation,
 } from "../middleware/validations";
 import { upload } from "../utils/upload";
-import {
-  addCourse,
-  deleteCourse,
-  getCourses,
-} from "../controller/course.controller";
 
 const router = Router();
 
@@ -40,9 +35,5 @@ router.put(
 );
 router.delete("/employees/:id", deleteEmployee);
 router.post("/login", loginValidation, validate, loginUser);
-
-router.get("/courses", getCourses);
-router.put("/courses", addCourse);
-router.delete("/courses", deleteCourse);
 
 export { router as employeeRouter };
