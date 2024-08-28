@@ -15,7 +15,7 @@ import EmployeeList from "./components/EmployeeList.tsx";
 import EditEmployee from "./components/EditEmployee.tsx";
 import CreateEmployee from "./components/CreateEmployee.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
-import CourceList from "./components/CourceList.tsx";
+import CourseList from "./components/CourseList.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -63,10 +63,10 @@ const router = createBrowserRouter(
       />
 
       <Route
-        path="cource-list"
+        path="course-list"
         element={
           <ProtectedRoute>
-            <CourceList />
+            <CourseList />
           </ProtectedRoute>
         }
       />

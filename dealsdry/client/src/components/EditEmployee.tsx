@@ -249,7 +249,7 @@ export default function EditEmployee() {
           </div>
         </div>
         <div className="mb-4">
-          <Link to={`/cource-list`} className="p-2 bg-green-600 rounded-md">
+          <Link to={`/course-list`} className="p-2 bg-green-600 rounded-md">
             Add/Delete Course
           </Link>
         </div>

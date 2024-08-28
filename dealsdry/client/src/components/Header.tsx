@@ -19,7 +19,7 @@ export default function Header() {
         <Link to={"/dashboard"}>Dashboard</Link>
         <Link to={"/employees-list"}>EmployeesList</Link>
       </div>
-      <Link to={"/cource-list"}>CourseList</Link>
+      <Link to={"/course-list"}>CourseList</Link>
       <div className="1/2"></div>
       <div className="flex justify-between w-1/3">
         <h3>{username}</h3>
