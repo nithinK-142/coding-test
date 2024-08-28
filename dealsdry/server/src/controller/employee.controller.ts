@@ -59,16 +59,24 @@ export const createEmployee = async (req: Request, res: Response) => {
   }
 };
 
+const IMAGE_NOT_FOUND_URL = "https://demofree.sirv.com/nope-not-here.jpg"; // Update this URL as needed
+
 export const editEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
 
-    if (req.file) {
+    if (updateData.delete_image === "true") {
+      // If delete_image is true, set the image to the "not found" URL
+      updateData.f_Image = IMAGE_NOT_FOUND_URL;
+    } else if (req.file) {
+      // If a new file is uploaded, update the image path
       const imagePath = `http://localhost:3001/public/temp/${req.file.filename}`;
       updateData.f_Image = imagePath;
     }
 
+    // Remove the delete_image field from updateData as it's not part of the Employee model
+    delete updateData.delete_image;
     const updatedEmployee = await EmployeeModel.findOneAndUpdate(
       { f_Id: id },
       updateData,
@@ -80,8 +88,11 @@ export const editEmployee = async (req: Request, res: Response) => {
     }
 
     res.status(200).json(updatedEmployee);
-  } catch (error) {
-    res.status(500).json({ message: "Error updating employee", error });
+  } catch (error: any) {
+    console.error("Error updating employee:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating employee", error: error.message });
   }
 };
 

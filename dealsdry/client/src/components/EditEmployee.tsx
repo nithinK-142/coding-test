@@ -12,6 +12,7 @@ export default function EditEmployee() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
+  const [imageDeleted, setImageDeleted] = useState(false);
 
   useEffect(() => {
     async function getEmployeeDetails() {
@@ -46,6 +47,7 @@ export default function EditEmployee() {
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       setSelectedFile(file);
       setSelectedFileName(file.name);
+      setImageDeleted(false);
     } else {
       alert("Only JPG/PNG files are allowed");
     }
@@ -57,6 +59,15 @@ export default function EditEmployee() {
       setSelectedCourses([...selectedCourses, value]);
     } else {
       setSelectedCourses(selectedCourses.filter((course) => course !== value));
+    }
+  };
+
+  const handleDeleteImage = () => {
+    setImageDeleted(true);
+    setSelectedFile(null);
+    setSelectedFileName("");
+    if (employee) {
+      setEmployee({ ...employee, f_Image: "" });
     }
   };
 
@@ -78,6 +89,9 @@ export default function EditEmployee() {
     formData.append("f_Course", selectedCourses.join(","));
     if (selectedFile) {
       formData.append("f_Image_file", selectedFile);
+    }
+    if (imageDeleted) {
+      formData.append("delete_image", "true");
     }
 
     try {
@@ -114,6 +128,27 @@ export default function EditEmployee() {
     <div className="flex flex-col items-center p-4">
       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
       <form onSubmit={handleSubmit}>
+        <div className="flex flex-col items-center mb-4">
+          {!imageDeleted && employee.f_Image && (
+            <>
+              <img
+                src={employee.f_Image}
+                alt={employee.f_Name}
+                className="object-cover w-16 h-16 mb-2 rounded-full"
+              />
+
+              <button
+                type="button"
+                onClick={handleDeleteImage}
+                className="px-2 py-1 text-white bg-red-500 rounded"
+                disabled={imageDeleted || !employee.f_Image}
+              >
+                Delete Image
+              </button>
+            </>
+          )}
+        </div>
+
         <div className="mb-4">
           <label className="block mb-2">
             Name:
