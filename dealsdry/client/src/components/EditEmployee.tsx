@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { IEmployee } from "./EmployeeList";
 
 export default function EditEmployee() {
@@ -21,7 +21,7 @@ export default function EditEmployee() {
           `${import.meta.env.VITE_API_URL}/${id}`
         );
         setEmployee(data);
-        setSelectedCourses(data.f_Course.split(","));
+        setSelectedCourses(data.f_Course.split(",").sort());
       } catch (error) {
         setError("Failed to fetch employee details.");
         console.error(error);
@@ -56,9 +56,11 @@ export default function EditEmployee() {
   const handleCourseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     if (checked) {
-      setSelectedCourses([...selectedCourses, value]);
+      setSelectedCourses((prev) => [...prev, value].sort());
     } else {
-      setSelectedCourses(selectedCourses.filter((course) => course !== value));
+      setSelectedCourses((prev) =>
+        prev.filter((course) => course !== value).sort()
+      );
     }
   };
 
@@ -206,40 +208,24 @@ export default function EditEmployee() {
 
         <div className="mb-4">
           <label className="block mb-2">Course:</label>
-          <div className="flex">
-            <label className="mr-4">
-              <input
-                type="checkbox"
-                name="f_Course"
-                value="MCA"
-                checked={selectedCourses.includes("MCA")}
-                onChange={handleCourseChange}
-                className="mr-2"
-              />
-              MCA
-            </label>
-            <label className="mr-4">
-              <input
-                type="checkbox"
-                name="f_Course"
-                value="BCA"
-                checked={selectedCourses.includes("BCA")}
-                onChange={handleCourseChange}
-                className="mr-2"
-              />
-              BCA
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="f_Course"
-                value="BSC"
-                checked={selectedCourses.includes("BSC")}
-                onChange={handleCourseChange}
-                className="mr-2"
-              />
-              BSC
-            </label>
+          <div className="flex flex-wrap">
+            {selectedCourses.sort().map((course) => (
+              <label key={course} className="mr-4">
+                <input
+                  type="checkbox"
+                  name="f_Course"
+                  value={course}
+                  checked={selectedCourses.includes(course)}
+                  onChange={handleCourseChange}
+                  className="mr-2"
+                />
+                {course}
+              </label>
+            ))}
+          </div>
+
+          <div>
+            <Link to={`/cource-list/${id}`}>Add/Delete Course</Link>
           </div>
         </div>
 
@@ -282,7 +268,7 @@ export default function EditEmployee() {
               onChange={handleFileChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
             />
-          </label>{" "}
+          </label>
           {selectedFileName && (
             <p className="text-sm text-gray-500">
               Selected file: {selectedFileName}

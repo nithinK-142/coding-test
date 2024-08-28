@@ -29,18 +29,20 @@ export const createEmployee = async (req: Request, res: Response) => {
   try {
     const { f_Name, f_Email, f_Mobile, f_Designation, f_gender, f_Course } =
       req.body;
+
     let imagePath: string | undefined;
     if (req.file) {
       imagePath = `http://localhost:3001/public/temp/${req.file.filename}`;
     }
+
     const lastEmployee = await EmployeeModel.findOne()
       .sort({ f_Id: -1 })
       .exec();
 
-    if (!lastEmployee) throw Error;
+    const newEmployeeId = lastEmployee ? lastEmployee.f_Id + 1 : 1;
 
     const newEmployee = new EmployeeModel({
-      f_Id: lastEmployee.f_Id + 1,
+      f_Id: newEmployeeId,
       f_Name,
       f_Email,
       f_Mobile,
@@ -54,7 +56,7 @@ export const createEmployee = async (req: Request, res: Response) => {
 
     res.status(201).json(savedEmployee);
   } catch (error: any) {
-    console.log(error.message);
+    console.log(error);
     res.status(500).json({ message: "Error creating employee", error });
   }
 };
@@ -142,5 +144,80 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error });
+  }
+};
+
+export const getCources = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const employee = await EmployeeModel.findOne({ f_Id: id });
+
+    // const employee = await EmployeeModel.findById(id).select("f_Courses");
+    console.log(employee);
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+    res.status(200).json(employee);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching employees", error });
+  }
+};
+
+export const addCourseToEmployee = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { course } = req.body;
+
+    const employee = await EmployeeModel.findOne({ f_Id: id });
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // Split the existing courses into an array and remove any empty strings
+    const existingCourses = employee.f_Course
+      ? employee.f_Course.split(",").filter(Boolean)
+      : [];
+
+    // Add the new course if it's not already in the list
+    if (!existingCourses.includes(course)) {
+      existingCourses.push(course);
+    }
+
+    // Join the courses back into a comma-separated string
+    employee.f_Course = existingCourses.join(",");
+
+    await employee.save();
+
+    res.status(200).json(employee);
+  } catch (error: any) {
+    console.log(error.message);
+    res.status(500).json({ message: "Error adding course", error });
+  }
+};
+
+export const deleteCourseFromEmployee = async (req: Request, res: Response) => {
+  try {
+    console.log("delete");
+    const { id } = req.params;
+    const { course } = req.body;
+    console.log(course);
+    const employee = await EmployeeModel.findOne({ f_Id: id });
+
+    if (!employee) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    const updatedCourses = employee.f_Course
+      .split(",")
+      .filter((c) => c.trim() !== course)
+      .join(",");
+
+    employee.f_Course = updatedCourses;
+    await employee.save();
+
+    res.status(200).json(employee);
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting course", error });
   }
 };

@@ -6,6 +6,9 @@ import {
   deleteEmployee,
   loginUser,
   getEmployee,
+  addCourseToEmployee,
+  deleteCourseFromEmployee,
+  getCources,
 } from "../controller/employee.controller";
 import {
   validate,
@@ -35,5 +38,9 @@ router.put(
 );
 router.delete("/employees/:id", deleteEmployee);
 router.post("/login", loginValidation, validate, loginUser);
+
+router.get("/courses/:id", getCources);
+router.put("/courses/:id", addCourseToEmployee);
+router.delete("/courses/:id", deleteCourseFromEmployee);
 
 export { router as employeeRouter };
