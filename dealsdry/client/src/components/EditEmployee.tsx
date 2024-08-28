@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { IEmployee } from "./EmployeeList";
+// import { COURSE_LIST } from "@/constants/cources";
 
 export default function EditEmployee() {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,23 @@ export default function EditEmployee() {
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [imageDeleted, setImageDeleted] = useState(false);
+
+  const [courses, setCourses] = useState<string[]>([]);
+  useEffect(() => {
+    const getCourses = async () => {
+      try {
+        const { data } = await axios.get(
+          `http://localhost:3001/api/v1/courses`
+        );
+        console.log(data[0].courses);
+        setCourses(data[0].courses.split(","));
+      } catch (error) {
+        console.error(error);
+        setError("Failed to add course");
+      }
+    };
+    getCourses();
+  }, []);
 
   useEffect(() => {
     async function getEmployeeDetails() {
@@ -126,31 +144,42 @@ export default function EditEmployee() {
     return <div>No employee found.</div>;
   }
 
+  // const combinedCourses = Array.from(
+  //   new Set([...COURSE_LIST, ...selectedCourses])
+  // ).sort();
+
   return (
     <div className="flex flex-col items-center p-4">
       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col items-center mb-4">
-          {!imageDeleted && employee.f_Image && (
-            <>
-              <img
-                src={employee.f_Image}
-                alt={employee.f_Name}
-                className="object-cover w-16 h-16 mb-2 rounded-full"
-              />
-
-              <button
-                type="button"
-                onClick={handleDeleteImage}
-                className="px-2 py-1 text-white bg-red-500 rounded"
-                disabled={imageDeleted || !employee.f_Image}
-              >
-                Delete Image
-              </button>
-            </>
+          {employee.f_Image ===
+            "https://demofree.sirv.com/nope-not-here.jpg" && (
+            <p className="text-red-500">No Image</p>
           )}
-        </div>
 
+          {!imageDeleted &&
+            employee.f_Image &&
+            employee.f_Image !==
+              "https://demofree.sirv.com/nope-not-here.jpg" && (
+              <>
+                <img
+                  src={employee.f_Image}
+                  alt={employee.f_Name}
+                  className="object-cover w-16 h-16 mb-2 rounded-full"
+                />
+
+                <button
+                  type="button"
+                  onClick={handleDeleteImage}
+                  className="px-2 py-1 text-white bg-red-500 rounded"
+                  disabled={imageDeleted || !employee.f_Image}
+                >
+                  Delete Image
+                </button>
+              </>
+            )}
+        </div>
         <div className="mb-4">
           <label className="block mb-2">
             Name:
@@ -163,7 +192,6 @@ export default function EditEmployee() {
             />
           </label>
         </div>
-
         <div className="mb-4">
           <label className="block mb-2">
             Email:
@@ -176,7 +204,6 @@ export default function EditEmployee() {
             />
           </label>
         </div>
-
         <div className="mb-4">
           <label className="block mb-2">
             Mobile No:
@@ -189,7 +216,6 @@ export default function EditEmployee() {
             />
           </label>
         </div>
-
         <div className="mb-4">
           <label className="block mb-2">
             Designation:
@@ -205,11 +231,10 @@ export default function EditEmployee() {
             </select>
           </label>
         </div>
-
         <div className="mb-4">
           <label className="block mb-2">Course:</label>
           <div className="flex flex-wrap">
-            {selectedCourses.sort().map((course) => (
+            {courses.map((course) => (
               <label key={course} className="mr-4">
                 <input
                   type="checkbox"
@@ -223,12 +248,12 @@ export default function EditEmployee() {
               </label>
             ))}
           </div>
-
-          <div>
-            <Link to={`/cource-list/${id}`}>Add/Delete Course</Link>
-          </div>
         </div>
-
+        <div className="mb-4">
+          <Link to={`/cource-list`} className="p-2 bg-green-600 rounded-md">
+            Add/Delete Course
+          </Link>
+        </div>
         <div className="mb-4">
           <label className="block mb-2">
             Gender:
@@ -258,7 +283,6 @@ export default function EditEmployee() {
             </div>
           </label>
         </div>
-
         <div className="mb-4">
           <label className="block mb-2">
             Img Upload:
@@ -275,7 +299,6 @@ export default function EditEmployee() {
             </p>
           )}
         </div>
-
         <button
           type="submit"
           className="px-4 py-2 text-white bg-blue-500 rounded"

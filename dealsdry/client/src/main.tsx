@@ -63,7 +63,7 @@ const router = createBrowserRouter(
       />
 
       <Route
-        path="cource-list/:id"
+        path="cource-list"
         element={
           <ProtectedRoute>
             <CourceList />

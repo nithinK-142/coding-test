@@ -6,9 +6,6 @@ import {
   deleteEmployee,
   loginUser,
   getEmployee,
-  addCourseToEmployee,
-  deleteCourseFromEmployee,
-  getCources,
 } from "../controller/employee.controller";
 import {
   validate,
@@ -17,6 +14,11 @@ import {
   createEmployeeValidation,
 } from "../middleware/validations";
 import { upload } from "../utils/upload";
+import {
+  addCourse,
+  deleteCourse,
+  getCourses,
+} from "../controller/course.controller";
 
 const router = Router();
 
@@ -39,8 +41,8 @@ router.put(
 router.delete("/employees/:id", deleteEmployee);
 router.post("/login", loginValidation, validate, loginUser);
 
-router.get("/courses/:id", getCources);
-router.put("/courses/:id", addCourseToEmployee);
-router.delete("/courses/:id", deleteCourseFromEmployee);
+router.get("/courses", getCourses);
+router.put("/courses", addCourse);
+router.delete("/courses", deleteCourse);
 
 export { router as employeeRouter };

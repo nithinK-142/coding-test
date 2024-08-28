@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IEmployee } from "./EmployeeList";
 
@@ -22,6 +22,22 @@ export default function CreateEmployee() {
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [, setError] = useState<string | null>(null);
 
+  const [courses, setCourses] = useState<string[]>([]);
+  useEffect(() => {
+    const getCourses = async () => {
+      try {
+        const { data } = await axios.get(
+          `http://localhost:3001/api/v1/courses`
+        );
+        console.log(data[0].courses);
+        setCourses(data[0].courses.split(","));
+      } catch (error) {
+        console.error(error);
+        setError("Failed to add course");
+      }
+    };
+    getCourses();
+  }, []);
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -142,36 +158,18 @@ export default function CreateEmployee() {
         <div className="mb-4">
           <label className="block mb-2">Course:</label>
           <div className="flex">
-            <label className="mr-4">
-              <input
-                type="checkbox"
-                name="f_Course"
-                value="MCA"
-                onChange={handleCourseChange}
-                className="mr-2"
-              />
-              MCA
-            </label>
-            <label className="mr-4">
-              <input
-                type="checkbox"
-                name="f_Course"
-                value="BCA"
-                onChange={handleCourseChange}
-                className="mr-2"
-              />
-              BCA
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="f_Course"
-                value="BSC"
-                onChange={handleCourseChange}
-                className="mr-2"
-              />
-              BSC
-            </label>
+            {courses.map((course) => (
+              <label key={course} className="mr-4">
+                <input
+                  type="checkbox"
+                  name="f_Course"
+                  value={course}
+                  onChange={handleCourseChange}
+                  className="mr-2"
+                />
+                {course}
+              </label>
+            ))}
           </div>
         </div>
 
@@ -214,7 +212,7 @@ export default function CreateEmployee() {
               onChange={handleFileChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
             />
-          </label>{" "}
+          </label>
           {selectedFileName && (
             <p className="text-sm text-gray-500">
               Selected file: {selectedFileName}
