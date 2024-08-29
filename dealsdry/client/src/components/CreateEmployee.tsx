@@ -1,5 +1,5 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IEmployee } from "./EmployeeList";
 
@@ -11,8 +11,8 @@ export default function CreateEmployee() {
     f_Name: "",
     f_Email: "",
     f_Mobile: "",
-    f_Designation: "HR",
-    f_gender: "Male",
+    f_Designation: "",
+    f_gender: "",
     f_Course: "",
     f_Createdate: new Date(),
   });
@@ -21,6 +21,7 @@ export default function CreateEmployee() {
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [courses, setCourses] = useState<string[]>([]);
   useEffect(() => {
@@ -29,7 +30,6 @@ export default function CreateEmployee() {
         const { data } = await axios.get(
           `http://localhost:3001/api/v1/courses`
         );
-        console.log(data.courses);
         setCourses(data.courses);
       } catch (error) {
         console.error(error);
@@ -50,9 +50,20 @@ export default function CreateEmployee() {
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       setSelectedFile(file);
       setSelectedFileName(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     } else {
       alert("Only JPG/PNG files are allowed");
     }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setSelectedFileName("");
+    setPreviewUrl(null);
   };
 
   const handleCourseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,6 +110,37 @@ export default function CreateEmployee() {
   return (
     <div className="flex flex-col items-center p-4">
       <h1 className="mb-4 text-2xl font-bold">Create Employee</h1>
+      {previewUrl && (
+        <div className="mb-4 rounded-full h-32 w-32 relative">
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-32 object-cover rounded-full"
+          />
+          <button
+            onClick={handleRemoveFile}
+            className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+          >
+            <span className="text-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-x"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block mb-2">
@@ -148,6 +190,9 @@ export default function CreateEmployee() {
               onChange={handleInputChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
             >
+              <option value="" hidden>
+                Select Designation
+              </option>
               <option value="HR">HR</option>
               <option value="Manager">Manager</option>
               <option value="Sales">Sales</option>
