@@ -20,7 +20,7 @@ export default function CreateEmployee() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-  const [, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [courses, setCourses] = useState<string[]>([]);
@@ -101,14 +101,20 @@ export default function CreateEmployee() {
       );
       console.log("Response:", response.data);
       navigate("/employees-list");
-    } catch (error) {
-      setError("Failed to create employee.");
-      console.error(error);
+    } catch (error: any) {
+      setError(error.response.data.errors[0].msg);
+      alert(error.response.data.errors[0].msg);
+      console.error(error.response.data.errors[0].msg);
+    } finally {
+      setTimeout(() => setError(""), 2000);
     }
   };
 
   return (
     <div className="flex flex-col items-center p-4">
+      {error && (
+        <div className="p-2 text-white bg-red-500 rounded-md">{error}</div>
+      )}
       <h1 className="mb-4 text-2xl font-bold">Create Employee</h1>
       {previewUrl && (
         <div className="mb-4 rounded-full h-32 w-32 relative">

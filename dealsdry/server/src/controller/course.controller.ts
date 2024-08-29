@@ -115,6 +115,25 @@ export const deleteCourse = async (req: Request, res: Response) => {
     courseEntry.courses = coursesArray.join(",");
     await courseEntry.save();
 
+    // await EmployeeModel.updateMany(
+    //   { f_Course: { $regex: `(^|,)${course}(,|$)` } },
+    //   {
+    //     $set: {
+    //       f_Course: {
+    //         $trim: {
+    //           input: {
+    //             $replaceAll: {
+    //               input: "$f_Course",
+    //               find: `,${course},`,
+    //               replacement: ",",
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   }
+    // );
+
     res.status(200).json({ message: "Course deleted", courses: coursesArray });
   } catch (error) {
     console.error(error);
