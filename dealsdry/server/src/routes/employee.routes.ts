@@ -4,12 +4,10 @@ import {
   createEmployee,
   editEmployee,
   deleteEmployee,
-  loginUser,
   getEmployee,
 } from "../controller/employee.controller";
 import {
   validate,
-  loginValidation,
   editEmployeeValidation,
   createEmployeeValidation,
 } from "../middleware/validations";
@@ -34,6 +32,5 @@ router.put(
   editEmployee
 );
 router.delete("/employees/:id", deleteEmployee);
-router.post("/login", loginValidation, validate, loginUser);
 
 export { router as employeeRouter };

@@ -124,7 +124,7 @@ export default function CourseList() {
                 </div>
               )}
               <div>
-                {editingCourse && editingCourse.index === index ? (
+                {/* {editingCourse && editingCourse.index === index ? (
                   <button
                     onClick={saveEdit}
                     className="p-1 mr-1 text-white bg-green-500 rounded-md"
@@ -138,7 +138,7 @@ export default function CourseList() {
                   >
                     Edit
                   </button>
-                )}
+                )} */}
                 <button
                   onClick={() => deleteCourse(course)}
                   className="p-1 text-white bg-red-500 rounded-md"

@@ -157,6 +157,7 @@ export default function CreateEmployee() {
               value={employee.f_Name}
               onChange={handleInputChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
+              placeholder="employee name"
             />
           </label>
         </div>
@@ -170,6 +171,7 @@ export default function CreateEmployee() {
               value={employee.f_Email}
               onChange={handleInputChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
+              placeholder="employee email"
             />
           </label>
         </div>
@@ -183,6 +185,7 @@ export default function CreateEmployee() {
               value={employee.f_Mobile}
               onChange={handleInputChange}
               className="w-full p-2 text-black border border-gray-300 rounded"
+              placeholder="mobile number"
             />
           </label>
         </div>

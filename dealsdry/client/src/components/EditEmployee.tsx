@@ -21,7 +21,6 @@ export default function EditEmployee() {
         const { data } = await axios.get(
           `http://localhost:3001/api/v1/courses`
         );
-        console.log(data.courses);
         setCourses(data.courses);
       } catch (error) {
         console.error(error);

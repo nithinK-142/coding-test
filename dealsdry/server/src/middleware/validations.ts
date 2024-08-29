@@ -1,7 +1,7 @@
 import { body, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 
-export const loginValidation = [
+export const authValidation = [
   body("f_userName").notEmpty().withMessage("Username is required"),
   body("f_Pwd").notEmpty().withMessage("Password is required"),
 ];
@@ -46,7 +46,10 @@ export const editEmployeeValidation = [
 export const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.error("Validation errors:", errors.array());
+    console.error(
+      "Validation errors:",
+      errors.array().map((e) => e.msg)
+    );
     return res.status(400).json({ errors: errors.array() });
   }
   next();
