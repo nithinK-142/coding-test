@@ -95,8 +95,18 @@ export const deleteCourse = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Course document not found" });
     }
 
-    const coursesArray = courseEntry.courses.split(",");
-    const index = coursesArray.indexOf(course);
+    const coursesArray = courseEntry.courses.split(",").map((c) => c.trim());
+
+    if (coursesArray.length === 1) {
+      return res
+        .status(400)
+        .json({ message: "There must atleast be one course" });
+    }
+
+    const index = coursesArray.findIndex(
+      (c) => c.toLowerCase() === course.trim().toLowerCase()
+    );
+
     if (index === -1) {
       return res.status(404).json({ message: "Course not found in the list" });
     }
@@ -105,30 +115,9 @@ export const deleteCourse = async (req: Request, res: Response) => {
     courseEntry.courses = coursesArray.join(",");
     await courseEntry.save();
 
-    // await EmployeeModel.updateMany(
-    //   { f_Course: { $regex: `(^|,)${course}(,|$)` } },
-    //   {
-    //     $set: {
-    //       f_Course: {
-    //         $trim: {
-    //           input: {
-    //             $replaceAll: {
-    //               input: "$f_Course",
-    //               find: `,${course},`,
-    //               replacement: ",",
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   }
-    // );
-
     res.status(200).json({ message: "Course deleted", courses: coursesArray });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ message: "There must atleast be one course", error });
+    res.status(500).json({ message: "Error deleting course", error });
   }
 };
