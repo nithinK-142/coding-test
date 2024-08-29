@@ -35,9 +35,10 @@ export default function CourseList() {
       const { data } = await axios.post(API_BASE_URL, { course: newCourse });
       setCourses(data.courses);
       setNewCourse("");
-    } catch (error) {
-      console.error(error);
-      setError("Failed to add course");
+    } catch (error: any) {
+      setError(error.response.data.message);
+    } finally {
+      setTimeout(() => setError(""), 2000);
     }
   };
 
@@ -46,9 +47,10 @@ export default function CourseList() {
       const { data } = await axios.delete(API_BASE_URL, { data: { course } });
       setCourses(data.courses);
       setNewCourse("");
-    } catch (error) {
-      console.error(error);
-      setError("Failed to delete course");
+    } catch (error: any) {
+      setError(error.response.data.message);
+    } finally {
+      setTimeout(() => setError(""), 2000);
     }
   };
 
@@ -67,9 +69,10 @@ export default function CourseList() {
       setCourses(data.courses);
       setNewCourse("");
       setEditingCourse(null);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to edit course");
+    } catch (error: any) {
+      setError(error.response.data.message);
+    } finally {
+      setTimeout(() => setError(""), 2000);
     }
   };
 
