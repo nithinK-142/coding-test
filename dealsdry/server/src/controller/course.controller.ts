@@ -25,14 +25,17 @@ export const addCourse = async (req: Request, res: Response) => {
     let courseEntry = await CourseModel.findOne();
 
     if (courseEntry) {
-      const coursesArray = courseEntry.courses.split(",");
-      if (coursesArray.includes(course)) {
+      const coursesArray = courseEntry.courses.split(",").map((c) => c.trim());
+      const lowercaseCoursesArray = coursesArray.map((c) => c.toLowerCase());
+
+      if (lowercaseCoursesArray.includes(course.toLowerCase().trim())) {
         return res.status(400).json({ message: "Course already exists" });
       }
-      coursesArray.push(course);
+
+      coursesArray.push(course.trim());
       courseEntry.courses = coursesArray.join(",");
     } else {
-      courseEntry = new CourseModel({ courses: course });
+      courseEntry = new CourseModel({ courses: course.trim() });
     }
 
     await courseEntry.save();
@@ -124,6 +127,8 @@ export const deleteCourse = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Course deleted", courses: coursesArray });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error deleting course", error });
+    res
+      .status(500)
+      .json({ message: "There must atleast be one course", error });
   }
 };
