@@ -15,7 +15,10 @@ export default function EditEmployee() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-  const [imageDeleted, setImageDeleted] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageState, setImageState] = useState<"existing" | "new" | "deleted">(
+    "existing"
+  );
 
   useEffect(() => {
     async function getEmployeeDetails() {
@@ -25,6 +28,12 @@ export default function EditEmployee() {
         );
         setEmployee(data);
         setSelectedCourses(data.f_Course.split(",").sort());
+        setPreviewUrl(data.f_Image);
+        setImageState(
+          data.f_Image === "https://demofree.sirv.com/nope-not-here.jpg"
+            ? "deleted"
+            : "existing"
+        );
       } catch (error) {
         setError("Failed to fetch employee details.");
         console.error(error);
@@ -50,7 +59,12 @@ export default function EditEmployee() {
     if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
       setSelectedFile(file);
       setSelectedFileName(file.name);
-      setImageDeleted(false);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      setImageState("new");
     } else {
       alert("Only JPG/PNG files are allowed");
     }
@@ -68,9 +82,10 @@ export default function EditEmployee() {
   };
 
   const handleDeleteImage = () => {
-    setImageDeleted(true);
     setSelectedFile(null);
     setSelectedFileName("");
+    setPreviewUrl(null);
+    setImageState("deleted");
     if (employee) {
       setEmployee({ ...employee, f_Image: "" });
     }
@@ -95,7 +110,7 @@ export default function EditEmployee() {
     if (selectedFile) {
       formData.append("f_Image_file", selectedFile);
     }
-    if (imageDeleted) {
+    if (imageState === "deleted") {
       formData.append("delete_image", "true");
     }
 
@@ -129,42 +144,42 @@ export default function EditEmployee() {
     return <div>No employee found.</div>;
   }
 
-  // const combinedCourses = Array.from(
-  //   new Set([...COURSE_LIST, ...selectedCourses])
-  // ).sort();
-
   return (
     <div className="flex flex-col items-center p-4">
       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-col items-center mb-4">
-          {employee.f_Image ===
-            "https://demofree.sirv.com/nope-not-here.jpg" && (
-            <p className="text-red-500">No Image</p>
-          )}
-
-          {!imageDeleted &&
-            employee.f_Image &&
-            employee.f_Image !==
-              "https://demofree.sirv.com/nope-not-here.jpg" && (
-              <>
-                <img
-                  src={employee.f_Image}
-                  alt={employee.f_Name}
-                  className="object-cover w-16 h-16 mb-2 rounded-full"
-                />
-
-                <button
-                  type="button"
-                  onClick={handleDeleteImage}
-                  className="px-2 py-1 text-white bg-red-500 rounded"
-                  disabled={imageDeleted || !employee.f_Image}
-                >
-                  Delete Image
-                </button>
-              </>
-            )}
+      {imageState === "deleted" && <p className="text-red-500">No Image</p>}
+      {previewUrl && imageState !== "deleted" && (
+        <div className="mb-4 rounded-full h-32 w-32 relative">
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-32 h-32 object-cover rounded-full"
+          />
+          <button
+            onClick={handleDeleteImage}
+            className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+          >
+            <span className="text-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-x"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </span>
+          </button>
         </div>
+      )}
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block mb-2">
             Name:
