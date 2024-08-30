@@ -2,7 +2,7 @@ import { body, validationResult } from "express-validator";
 import { Request, Response, NextFunction } from "express";
 
 export const authValidation = [
-  body("f_userName").notEmpty().withMessage("Username is required"),
+  body("f_UserName").notEmpty().withMessage("Username is required"),
   body("f_Pwd").notEmpty().withMessage("Password is required"),
 ];
 
@@ -11,7 +11,7 @@ export const employeeValidation = [
   body("f_Email").isEmail().withMessage("Invalid email address"),
   body("f_Mobile").isMobilePhone("any").withMessage("Invalid mobile number"),
   body("f_Designation").notEmpty().withMessage("Designation is required"),
-  body("f_gender")
+  body("f_Gender")
     .isIn(["Male", "Female", "other"])
     .withMessage("Invalid gender"),
   body("f_Course").notEmpty().withMessage("Course is required"),
@@ -29,7 +29,6 @@ export const createEmployeeValidation = [
 
 export const editEmployeeValidation = [
   ...employeeValidation,
-  body("f_Id").isNumeric().withMessage("Employee ID must be a number"),
   body("f_Image_file")
     .optional()
     .custom((value, { req }) => {

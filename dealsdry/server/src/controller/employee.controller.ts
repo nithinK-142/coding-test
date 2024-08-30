@@ -1,110 +1,127 @@
 import type { Request, Response } from "express";
 import { EmployeeModel, IEmployee } from "../model/employee.model";
+import { CourseModel } from "../model/courses.model";
+import mongoose from "mongoose";
+import { handleServerError } from "../utils/utility";
 
 export const getEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const employee = await EmployeeModel.findOne({ f_Id: id });
+    const employee = await EmployeeModel.findById(id);
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-    res.status(200).json(employee);
+    res.status(200).json({ employee });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching employees", error });
+    handleServerError(res, error, "Error fetching employee");
   }
 };
-export const getEmployees = async (req: Request, res: Response) => {
+
+export const getEmployees = async (_req: Request, res: Response) => {
   try {
-    const employees: IEmployee[] = await EmployeeModel.find();
-    res.status(200).json(employees);
+    const employees = await EmployeeModel.find().sort({ f_CreatedAt: -1 });
+    res.status(200).json({ employees });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching employees", error });
+    handleServerError(res, error, "Error fetching employees");
   }
 };
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const { f_Name, f_Email, f_Mobile, f_Designation, f_gender, f_Course } =
+    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_CourseId } =
       req.body;
+    const f_Image = req.file
+      ? `http://localhost:3001/public/temp/${req.file.filename}`
+      : undefined;
 
-    let imagePath: string | undefined;
-    if (req.file) {
-      imagePath = `http://localhost:3001/public/temp/${req.file.filename}`;
+    if (
+      !f_Name ||
+      !f_Email ||
+      !f_Mobile ||
+      !f_Designation ||
+      !f_Gender ||
+      !f_CourseId
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    const lastEmployee = await EmployeeModel.findOne()
-      .sort({ f_Id: -1 })
-      .exec();
+    const course = await CourseModel.findById(f_CourseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
 
-    const newEmployeeId = lastEmployee ? lastEmployee.f_Id + 1 : 1;
-
-    const newEmployee = new EmployeeModel({
-      f_Id: newEmployeeId,
+    const newEmployee: IEmployee = new EmployeeModel({
+      _id: new mongoose.Types.ObjectId(),
+      f_Image,
       f_Name,
       f_Email,
       f_Mobile,
       f_Designation,
-      f_gender,
-      f_Course,
-      f_Image: imagePath,
+      f_Gender,
+      f_Course: {
+        _id: course._id,
+        f_CourseName: course.f_CourseName,
+      },
     });
 
-    const savedEmployee = await newEmployee.save();
-
-    res.status(201).json(savedEmployee);
-  } catch (error: any) {
-    console.log(error);
-    res.status(500).json({ message: "Error creating employee", error });
+    await newEmployee.save();
+    res
+      .status(201)
+      .json({ message: "Employee created", employee: newEmployee });
+  } catch (error) {
+    handleServerError(res, error, "Error creating employee");
   }
 };
 
 export const editEmployee = async (req: Request, res: Response) => {
-  const IMAGE_NOT_FOUND_URL = "https://demofree.sirv.com/nope-not-here.jpg";
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_CourseId } =
+      req.body;
+    const f_Image = req.file
+      ? `http://localhost:3001/public/temp/${req.file.filename}`
+      : undefined;
 
-    if (updateData.delete_image === "true") {
-      // If delete_image is true, set the image to the "not found" URL
-      updateData.f_Image = IMAGE_NOT_FOUND_URL;
-    } else if (req.file) {
-      // If a new file is uploaded, update the image path
-      const imagePath = `http://localhost:3001/public/temp/${req.file.filename}`;
-      updateData.f_Image = imagePath;
-    }
-
-    // Remove the delete_image field from updateData as it's not part of the Employee model
-    delete updateData.delete_image;
-    const updatedEmployee = await EmployeeModel.findOneAndUpdate(
-      { f_Id: id },
-      updateData,
-      { new: true }
-    );
-
-    if (!updatedEmployee) {
+    const employee = await EmployeeModel.findById(id);
+    if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    res.status(200).json(updatedEmployee);
-  } catch (error: any) {
-    console.error("Error updating employee:", error);
-    res
-      .status(500)
-      .json({ message: "Error updating employee", error: error.message });
+    if (f_CourseId && f_CourseId !== employee.f_Course._id.toString()) {
+      const course = await CourseModel.findById(f_CourseId);
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+      employee.f_Course = {
+        _id: course._id,
+        f_CourseName: course.f_CourseName,
+      };
+    }
+
+    if (f_Name) employee.f_Name = f_Name;
+    if (f_Email) employee.f_Email = f_Email;
+    if (f_Mobile) employee.f_Mobile = f_Mobile;
+    if (f_Designation) employee.f_Designation = f_Designation;
+    if (f_Gender) employee.f_Gender = f_Gender;
+    if (f_Image) employee.f_Image = f_Image;
+
+    await employee.save();
+    res.status(200).json({ message: "Employee updated", employee });
+  } catch (error) {
+    handleServerError(res, error, "Error updating employee");
   }
 };
 
 export const deleteEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const deletedEmployee = await EmployeeModel.findOneAndDelete({ f_Id: id });
 
-    if (!deletedEmployee) {
+    const employee = await EmployeeModel.findByIdAndDelete(id);
+    if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-
-    res.status(200).json({ message: "Employee deleted successfully" });
+    res.status(200).json({ message: "Employee deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting employee", error });
+    handleServerError(res, error, "Error deleting employee");
   }
 };

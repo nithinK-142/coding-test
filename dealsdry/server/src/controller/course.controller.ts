@@ -1,18 +1,18 @@
 import type { Request, Response } from "express";
 import { CourseModel } from "../model/courses.model";
+import mongoose from "mongoose";
 import {
-  getCoursesArray,
-  checkCourseExists,
+  findCourses,
   handleServerError,
-  findCourseEntry,
+  checkCourseExists,
   findEnrolledEmployees,
   formatEnrolledEmployees,
-} from "../utils/course";
+} from "../utils/utility";
 
-export const getCourses = async (req: Request, res: Response) => {
+export const getCourses = async (_req: Request, res: Response) => {
   try {
-    const courseEntry = await findCourseEntry();
-    res.status(200).json({ courses: getCoursesArray(courseEntry.courses) });
+    const courses = await findCourses();
+    res.status(200).json({ courses });
   } catch (error) {
     if (error instanceof Error && error.message === "Courses not found") {
       res.status(404).json({ message: error.message });
@@ -21,29 +21,29 @@ export const getCourses = async (req: Request, res: Response) => {
     }
   }
 };
+
 export const addCourse = async (req: Request, res: Response) => {
   try {
-    const { course } = req.body;
-    if (!course) {
-      return res.status(400).json({ message: "Course is required" });
+    const { f_CourseName } = req.body;
+    if (!f_CourseName) {
+      return res.status(400).json({ message: "Course name is required" });
     }
 
-    let courseEntry = await CourseModel.findOne();
-    if (courseEntry) {
-      const coursesArray = getCoursesArray(courseEntry.courses);
-      if (checkCourseExists(coursesArray, course)) {
-        return res.status(400).json({ message: "Course already exists" });
-      }
-      coursesArray.push(course.trim());
-      courseEntry.courses = coursesArray.join(",");
-    } else {
-      courseEntry = new CourseModel({ courses: course.trim() });
+    const courses = await CourseModel.find();
+    if (checkCourseExists(courses, f_CourseName)) {
+      return res.status(400).json({ message: "Course already exists" });
     }
 
-    await courseEntry.save();
+    const newCourse = new CourseModel({
+      _id: new mongoose.Types.ObjectId(),
+      f_CourseName: f_CourseName.trim(),
+    });
+
+    await newCourse.save();
+
     res.status(201).json({
       message: "Course added",
-      courses: getCoursesArray(courseEntry.courses),
+      courses: findCourses(),
     });
   } catch (error) {
     handleServerError(res, error, "Error adding course");
@@ -52,32 +52,34 @@ export const addCourse = async (req: Request, res: Response) => {
 
 export const editCourse = async (req: Request, res: Response) => {
   try {
-    const { oldCourse, newCourse } = req.body;
-    if (!oldCourse || !newCourse) {
+    const { oldCourseId, newCourseName } = req.body;
+    if (!oldCourseId || !newCourseName) {
       return res
         .status(400)
-        .json({ message: "Old and new course names are required" });
+        .json({ message: "Course ID and new course name are required" });
     }
 
-    const courseEntry = await findCourseEntry();
-    const coursesArray = getCoursesArray(courseEntry.courses);
-    const index = coursesArray.indexOf(oldCourse);
-    if (index === -1) {
-      return res.status(404).json({ message: "Course not found in the list" });
+    const course = await CourseModel.findById(oldCourseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
     }
 
-    const enrolledEmployees = await findEnrolledEmployees(oldCourse);
+    if (course.f_CourseName === newCourseName) {
+      return res.status(400).json({ message: "Course name is same" });
+    }
+
+    const enrolledEmployees = await findEnrolledEmployees(course._id);
     if (enrolledEmployees.length > 0) {
       return res.status(400).json({
-        message: `Cannot edit the course, There are ${enrolledEmployees.length} employees enrolled to ${oldCourse}.`,
+        message: `Cannot edit the course. There are ${enrolledEmployees.length} employees enrolled in ${course.f_CourseName}.`,
         ...formatEnrolledEmployees(enrolledEmployees),
       });
     }
 
-    coursesArray[index] = newCourse;
-    courseEntry.courses = coursesArray.join(",");
-    await courseEntry.save();
-    res.status(200).json({ message: "Course updated", courses: coursesArray });
+    course.f_CourseName = newCourseName.trim();
+    await course.save();
+
+    res.status(200).json({ message: "Course updated", courses: findCourses() });
   } catch (error) {
     handleServerError(res, error, "Error updating course");
   }
@@ -85,38 +87,34 @@ export const editCourse = async (req: Request, res: Response) => {
 
 export const deleteCourse = async (req: Request, res: Response) => {
   try {
-    const { course } = req.body;
-    if (!course) {
-      return res.status(400).json({ message: "Course is required" });
+    const { courseId } = req.body;
+    if (!courseId) {
+      return res.status(400).json({ message: "Course ID is required" });
     }
 
-    const courseEntry = await findCourseEntry();
-    const coursesArray = getCoursesArray(courseEntry.courses);
-    if (coursesArray.length === 1) {
+    const courses = await CourseModel.find();
+    if (courses.length === 1) {
       return res
         .status(400)
         .json({ message: "There must be at least one course" });
     }
 
-    const index = coursesArray.findIndex(
-      (c) => c.toLowerCase() === course.trim().toLowerCase()
-    );
-    if (index === -1) {
-      return res.status(404).json({ message: "Course not found in the list" });
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
     }
 
-    const enrolledEmployees = await findEnrolledEmployees(course);
+    const enrolledEmployees = await findEnrolledEmployees(course._id);
     if (enrolledEmployees.length > 0) {
       return res.status(400).json({
-        message: `Cannot delete course. There are ${enrolledEmployees.length} employees enrolled to ${course}.`,
+        message: `Cannot delete course. There are ${enrolledEmployees.length} employees enrolled in ${course.f_CourseName}.`,
         ...formatEnrolledEmployees(enrolledEmployees),
       });
     }
 
-    coursesArray.splice(index, 1);
-    courseEntry.courses = coursesArray.join(",");
-    await courseEntry.save();
-    res.status(200).json({ message: "Course deleted", courses: coursesArray });
+    await CourseModel.deleteOne({ _id: course._id });
+
+    res.status(200).json({ message: "Course deleted", courses: findCourses() });
   } catch (error) {
     handleServerError(res, error, "Error deleting course");
   }

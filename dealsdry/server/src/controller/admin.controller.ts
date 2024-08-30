@@ -5,8 +5,9 @@ import jwt from "jsonwebtoken";
 
 export const adminLogin = async (req: Request, res: Response) => {
   try {
-    const { f_userName, f_Pwd } = req.body;
-    const user: ILogin | null = await LoginModel.findOne({ f_userName });
+    const { f_UserName, f_Pwd } = req.body;
+
+    const user: ILogin | null = await LoginModel.findOne({ f_UserName });
 
     if (!user) {
       return res.status(401).json({ message: "Invalid login details" });
@@ -19,7 +20,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, username: user.f_userName },
+      { userId: user._id, username: user.f_UserName },
       process.env.JWT_SECRET || "dealsdry",
       { expiresIn: "1h" }
     );
@@ -29,7 +30,7 @@ export const adminLogin = async (req: Request, res: Response) => {
       token,
       user: {
         id: user._id,
-        username: user.f_userName,
+        username: user.f_UserName,
       },
     });
   } catch (error) {
@@ -39,21 +40,17 @@ export const adminLogin = async (req: Request, res: Response) => {
 
 export const createAdmin = async (req: Request, res: Response) => {
   try {
-    const { f_userName, f_Pwd } = req.body;
+    const { f_UserName, f_Pwd } = req.body;
 
-    const existingAdmin = await LoginModel.findOne({ f_userName });
+    const existingAdmin = await LoginModel.findOne({ f_UserName });
     if (existingAdmin) {
-      res.status(409).json({ message: "Admin already exists" });
-      return;
+      return res.status(409).json({ message: "Admin already exists" });
     }
 
-    const lastAdmin = await LoginModel.findOne().sort({ f_sno: -1 }).exec();
-    const newAdminSno = lastAdmin ? lastAdmin.f_sno + 1 : 1;
-
     const hashedPassword = await bcrypt.hash(f_Pwd, 10);
+
     const newAdmin = new LoginModel({
-      f_sno: newAdminSno,
-      f_userName,
+      f_UserName,
       f_Pwd: hashedPassword,
     });
 
@@ -63,8 +60,7 @@ export const createAdmin = async (req: Request, res: Response) => {
       message: "Admin created successfully",
       admin: {
         id: newAdmin._id,
-        username: newAdmin.f_userName,
-        sno: newAdmin.f_sno,
+        username: newAdmin.f_UserName,
       },
     });
   } catch (error) {
