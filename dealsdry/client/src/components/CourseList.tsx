@@ -18,9 +18,17 @@ export default function CourseList() {
 
   const handleUpdateCourse = () => {
     if (editingCourse) {
+      if (courses[editingCourse.index] === editingCourse.value) {
+        setEditingCourse(null);
+        return;
+      }
       updateCourse(courses[editingCourse.index], editingCourse.value);
       setEditingCourse(null);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCourse(null);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -70,28 +78,38 @@ export default function CourseList() {
                   <span>{course}</span>
                 </div>
               )}
-              <div>
+              <div className="flex">
                 {editingCourse && editingCourse.index === index ? (
-                  <button
-                    onClick={handleUpdateCourse}
-                    className="p-1 mr-1 text-white bg-green-500 rounded-md"
-                  >
-                    Save
-                  </button>
+                  <>
+                    <button
+                      onClick={handleUpdateCourse}
+                      className="p-1 mr-1 text-white bg-green-500 rounded-md"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="p-1 mr-1 text-white bg-gray-500 rounded-md"
+                    >
+                      Cancel
+                    </button>
+                  </>
                 ) : (
-                  <button
-                    onClick={() => setEditingCourse({ index, value: course })}
-                    className="p-1 mr-1 text-white bg-yellow-500 rounded-md"
-                  >
-                    Edit
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setEditingCourse({ index, value: course })}
+                      className="p-1 mr-1 text-white bg-yellow-500 rounded-md"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteCourse(course)}
+                      className="p-1 text-white bg-red-500 rounded-md"
+                    >
+                      Delete
+                    </button>
+                  </>
                 )}
-                <button
-                  onClick={() => deleteCourse(course)}
-                  className="p-1 text-white bg-red-500 rounded-md"
-                >
-                  Delete
-                </button>
               </div>
             </li>
           ))}
