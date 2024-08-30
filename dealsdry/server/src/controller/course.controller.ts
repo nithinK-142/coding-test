@@ -1,37 +1,39 @@
 import type { Request, Response } from "express";
 import { CourseModel } from "../model/courses.model";
+import {
+  getCoursesArray,
+  checkCourseExists,
+  handleServerError,
+  findCourseEntry,
+  findEnrolledEmployees,
+  formatEnrolledEmployees,
+} from "../utils/course";
 
 export const getCourses = async (req: Request, res: Response) => {
   try {
-    const courseEntry = await CourseModel.findOne();
-
-    if (!courseEntry || !courseEntry.courses) {
-      return res.status(404).json({ message: "Courses not found" });
-    }
-    res.status(200).json({ courses: courseEntry.courses.split(",") });
+    const courseEntry = await findCourseEntry();
+    res.status(200).json({ courses: getCoursesArray(courseEntry.courses) });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching courses", error });
+    if (error instanceof Error && error.message === "Courses not found") {
+      res.status(404).json({ message: error.message });
+    } else {
+      handleServerError(res, error, "Error fetching courses");
+    }
   }
 };
-
 export const addCourse = async (req: Request, res: Response) => {
   try {
     const { course } = req.body;
-
     if (!course) {
       return res.status(400).json({ message: "Course is required" });
     }
 
     let courseEntry = await CourseModel.findOne();
-
     if (courseEntry) {
-      const coursesArray = courseEntry.courses.split(",").map((c) => c.trim());
-      const lowercaseCoursesArray = coursesArray.map((c) => c.toLowerCase());
-
-      if (lowercaseCoursesArray.includes(course.toLowerCase().trim())) {
+      const coursesArray = getCoursesArray(courseEntry.courses);
+      if (checkCourseExists(coursesArray, course)) {
         return res.status(400).json({ message: "Course already exists" });
       }
-
       coursesArray.push(course.trim());
       courseEntry.courses = coursesArray.join(",");
     } else {
@@ -39,104 +41,83 @@ export const addCourse = async (req: Request, res: Response) => {
     }
 
     await courseEntry.save();
-
     res.status(201).json({
       message: "Course added",
-      courses: courseEntry.courses.split(","),
+      courses: getCoursesArray(courseEntry.courses),
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error adding course", error });
+    handleServerError(res, error, "Error adding course");
   }
 };
 
 export const editCourse = async (req: Request, res: Response) => {
   try {
     const { oldCourse, newCourse } = req.body;
-
     if (!oldCourse || !newCourse) {
       return res
         .status(400)
         .json({ message: "Old and new course names are required" });
     }
 
-    const courseEntry = await CourseModel.findOne();
-    if (!courseEntry) {
-      return res.status(404).json({ message: "Course document not found" });
-    }
-
-    const coursesArray = courseEntry.courses.split(",");
+    const courseEntry = await findCourseEntry();
+    const coursesArray = getCoursesArray(courseEntry.courses);
     const index = coursesArray.indexOf(oldCourse);
     if (index === -1) {
       return res.status(404).json({ message: "Course not found in the list" });
     }
 
+    const enrolledEmployees = await findEnrolledEmployees(oldCourse);
+    if (enrolledEmployees.length > 0) {
+      return res.status(400).json({
+        message: `Cannot edit the course, There are ${enrolledEmployees.length} employees enrolled to ${oldCourse}.`,
+        ...formatEnrolledEmployees(enrolledEmployees),
+      });
+    }
+
     coursesArray[index] = newCourse;
     courseEntry.courses = coursesArray.join(",");
     await courseEntry.save();
-
     res.status(200).json({ message: "Course updated", courses: coursesArray });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error updating course", error });
+    handleServerError(res, error, "Error updating course");
   }
 };
 
 export const deleteCourse = async (req: Request, res: Response) => {
   try {
     const { course } = req.body;
-
     if (!course) {
       return res.status(400).json({ message: "Course is required" });
     }
 
-    const courseEntry = await CourseModel.findOne();
-    if (!courseEntry) {
-      return res.status(404).json({ message: "Course document not found" });
-    }
-
-    const coursesArray = courseEntry.courses.split(",").map((c) => c.trim());
-
+    const courseEntry = await findCourseEntry();
+    const coursesArray = getCoursesArray(courseEntry.courses);
     if (coursesArray.length === 1) {
       return res
         .status(400)
-        .json({ message: "There must atleast be one course" });
+        .json({ message: "There must be at least one course" });
     }
 
     const index = coursesArray.findIndex(
       (c) => c.toLowerCase() === course.trim().toLowerCase()
     );
-
     if (index === -1) {
       return res.status(404).json({ message: "Course not found in the list" });
+    }
+
+    const enrolledEmployees = await findEnrolledEmployees(course);
+    if (enrolledEmployees.length > 0) {
+      return res.status(400).json({
+        message: `Cannot delete course. There are ${enrolledEmployees.length} employees enrolled to ${course}.`,
+        ...formatEnrolledEmployees(enrolledEmployees),
+      });
     }
 
     coursesArray.splice(index, 1);
     courseEntry.courses = coursesArray.join(",");
     await courseEntry.save();
-
-    // await EmployeeModel.updateMany(
-    //   { f_Course: { $regex: `(^|,)${course}(,|$)` } },
-    //   {
-    //     $set: {
-    //       f_Course: {
-    //         $trim: {
-    //           input: {
-    //             $replaceAll: {
-    //               input: "$f_Course",
-    //               find: `,${course},`,
-    //               replacement: ",",
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   }
-    // );
-
     res.status(200).json({ message: "Course deleted", courses: coursesArray });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error deleting course", error });
+    handleServerError(res, error, "Error deleting course");
   }
 };

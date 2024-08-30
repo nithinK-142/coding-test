@@ -58,9 +58,8 @@ export const createEmployee = async (req: Request, res: Response) => {
   }
 };
 
-const IMAGE_NOT_FOUND_URL = "https://demofree.sirv.com/nope-not-here.jpg"; // Update this URL as needed
-
 export const editEmployee = async (req: Request, res: Response) => {
+  const IMAGE_NOT_FOUND_URL = "https://demofree.sirv.com/nope-not-here.jpg";
   try {
     const { id } = req.params;
     const updateData = req.body;
