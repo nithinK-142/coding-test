@@ -2,10 +2,13 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { IEmployee } from "./EmployeeList";
+import { useCourseContext } from "@/context/course-context";
 
 export default function EditEmployee() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const { courses, sortCourses } = useCourseContext();
   const [employee, setEmployee] = useState<IEmployee | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,22 +16,6 @@ export default function EditEmployee() {
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [imageDeleted, setImageDeleted] = useState(false);
-
-  const [courses, setCourses] = useState<string[]>([]);
-  useEffect(() => {
-    const getCourses = async () => {
-      try {
-        const { data } = await axios.get(
-          `http://localhost:3001/api/v1/courses`
-        );
-        setCourses(data.courses);
-      } catch (error) {
-        console.error(error);
-        setError("Failed to add course");
-      }
-    };
-    getCourses();
-  }, []);
 
   useEffect(() => {
     async function getEmployeeDetails() {
@@ -232,7 +219,7 @@ export default function EditEmployee() {
         <div className="mb-4">
           <label className="block mb-2">Course:</label>
           <div className="flex flex-wrap">
-            {courses.map((course) => (
+            {sortCourses(courses).map((course) => (
               <label key={course} className="mr-4">
                 <input
                   type="checkbox"
