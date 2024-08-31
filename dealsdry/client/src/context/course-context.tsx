@@ -9,15 +9,21 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3001/api/v1/courses";
 
+interface ICourse {
+  _id: string;
+  f_CourseName: string;
+  f_CreatedAt: string;
+}
+
 interface ICourseContext {
-  courses: string[];
+  courses: ICourse[];
   loading: boolean;
   error: string;
   fetchCourses: () => Promise<void>;
-  addCourse: (newCourse: string) => Promise<void>;
-  deleteCourse: (course: string) => Promise<void>;
-  updateCourse: (oldCourse: string, newCourse: string) => Promise<void>;
-  sortCourses: (coursesArray: string[]) => string[];
+  addCourse: (newCourseName: string) => Promise<void>;
+  deleteCourse: (courseId: string) => Promise<void>;
+  updateCourse: (courseId: string, newCourseName: string) => Promise<void>;
+  sortCourses: (courses: ICourse[]) => ICourse[];
 }
 
 const CourseContext = createContext<ICourseContext>({
@@ -28,24 +34,20 @@ const CourseContext = createContext<ICourseContext>({
   addCourse: () => Promise.resolve(),
   deleteCourse: () => Promise.resolve(),
   updateCourse: () => Promise.resolve(),
-  sortCourses: () => [],
+  sortCourses: (courses) => courses,
 });
 
 export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [courses, setCourses] = useState<string[]>([]);
+  const [courses, setCourses] = useState<ICourse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-
-  const sortCourses = (coursesArray: string[]): string[] => {
-    return [...coursesArray].sort((a, b) => a.localeCompare(b));
-  };
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(API_BASE_URL);
+      const { data } = await axios.get<{ courses: ICourse[] }>(API_BASE_URL);
       setCourses(data.courses);
       setError("");
     } catch (error) {
@@ -56,10 +58,12 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const addCourse = useCallback(async (newCourse: string) => {
-    if (!newCourse.trim()) return;
+  const addCourse = useCallback(async (newCourseName: string) => {
+    if (!newCourseName.trim()) return;
     try {
-      const { data } = await axios.post(API_BASE_URL, { course: newCourse });
+      const { data } = await axios.post<{ courses: ICourse[] }>(API_BASE_URL, {
+        f_CourseName: newCourseName,
+      });
       setCourses(data.courses);
     } catch (error: any) {
       setError(error.response?.data?.message || "Failed to add course");
@@ -68,9 +72,12 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  const deleteCourse = useCallback(async (course: string) => {
+  const deleteCourse = useCallback(async (courseId: string) => {
     try {
-      const { data } = await axios.delete(API_BASE_URL, { data: { course } });
+      const { data } = await axios.delete<{ courses: ICourse[] }>(
+        API_BASE_URL,
+        { data: { courseId } }
+      );
       setCourses(data.courses);
     } catch (error: any) {
       setError(error.response?.data?.message || "Failed to delete course");
@@ -80,11 +87,11 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const updateCourse = useCallback(
-    async (oldCourse: string, newCourse: string) => {
+    async (courseId: string, newCourseName: string) => {
       try {
-        const { data } = await axios.put(API_BASE_URL, {
-          oldCourse,
-          newCourse,
+        const { data } = await axios.put<{ courses: ICourse[] }>(API_BASE_URL, {
+          oldCourseId: courseId,
+          newCourseName,
         });
         setCourses(data.courses);
       } catch (error: any) {
@@ -96,9 +103,15 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
     []
   );
 
+  const sortCourses = useCallback((courses: ICourse[]) => {
+    return [...courses].sort((a, b) =>
+      a.f_CourseName.localeCompare(b.f_CourseName)
+    );
+  }, []);
+
   useEffect(() => {
     fetchCourses();
-  }, []);
+  }, [fetchCourses]);
 
   return (
     <CourseContext.Provider

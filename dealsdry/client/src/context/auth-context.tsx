@@ -6,7 +6,7 @@ export interface IAuthContext {
   isAuthenticated: boolean;
   login: (token: string, username: string) => void;
   logout: () => void;
-  createAdmin: (f_userName: string, f_Pwd: string) => void;
+  createAdmin: (f_UserName: string, f_Pwd: string) => void;
 }
 
 const defaultVal: IAuthContext = {
@@ -32,12 +32,12 @@ export const AuthContextProvider = (props: { children: React.ReactNode }) => {
     navigate("/dashboard");
   }, []);
 
-  const createAdmin = useCallback(async (f_userName: string, f_Pwd: string) => {
+  const createAdmin = useCallback(async (f_UserName: string, f_Pwd: string) => {
     try {
       const { data } = await axios.post(
         "http://localhost:3001/api/v1/create-admin",
         {
-          f_userName,
+          f_UserName,
           f_Pwd,
         }
       );

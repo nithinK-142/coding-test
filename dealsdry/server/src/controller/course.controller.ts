@@ -43,7 +43,7 @@ export const addCourse = async (req: Request, res: Response) => {
 
     res.status(201).json({
       message: "Course added",
-      courses: findCourses(),
+      courses: await findCourses(),
     });
   } catch (error) {
     handleServerError(res, error, "Error adding course");
@@ -79,7 +79,9 @@ export const editCourse = async (req: Request, res: Response) => {
     course.f_CourseName = newCourseName.trim();
     await course.save();
 
-    res.status(200).json({ message: "Course updated", courses: findCourses() });
+    res
+      .status(200)
+      .json({ message: "Course updated", courses: await findCourses() });
   } catch (error) {
     handleServerError(res, error, "Error updating course");
   }
@@ -114,7 +116,9 @@ export const deleteCourse = async (req: Request, res: Response) => {
 
     await CourseModel.deleteOne({ _id: course._id });
 
-    res.status(200).json({ message: "Course deleted", courses: findCourses() });
+    res
+      .status(200)
+      .json({ message: "Course deleted", courses: await findCourses() });
   } catch (error) {
     handleServerError(res, error, "Error deleting course");
   }

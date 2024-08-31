@@ -4,7 +4,7 @@ import { AuthContext } from "@/context/auth-context";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
-    f_userName: "",
+    f_UserName: "",
     f_Pwd: "",
   });
   const [error, setError] = useState("");
@@ -50,9 +50,9 @@ const Login = () => {
               <div className="mt-1">
                 <input
                   id="username"
-                  name="f_userName"
+                  name="f_UserName"
                   type="text"
-                  value={credentials.f_userName}
+                  value={credentials.f_UserName}
                   onChange={handleChange}
                   required
                   className="relative block w-full px-3 py-2 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
