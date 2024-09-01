@@ -93,11 +93,22 @@ export const createEmployee = async (req: Request, res: Response) => {
 export const editEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_Course } =
-      req.body;
-    const f_Image = !req.file
-      ? "https://demofree.sirv.com/nope-not-here.jpg"
-      : `http://localhost:3001/public/temp/${req.file.filename}`;
+    const {
+      f_Name,
+      f_Email,
+      f_Mobile,
+      f_Designation,
+      f_Gender,
+      f_Course,
+      avatarState,
+    } = req.body;
+
+    const f_Image =
+      avatarState === "true"
+        ? "https://demofree.sirv.com/nope-not-here.jpg"
+        : req.file
+        ? `http://localhost:3001/public/temp/${req.file.filename}`
+        : undefined;
 
     const employee = await EmployeeModel.findById(id);
     if (!employee) {

@@ -16,9 +16,9 @@ export default function EditEmployee() {
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageState, setImageState] = useState<"existing" | "new" | "deleted">(
-    "existing"
-  );
+  const [avatarState, setAvatarState] = useState<
+    "existing" | "new" | "deleted"
+  >("existing");
 
   useEffect(() => {
     async function getEmployeeDetails() {
@@ -29,7 +29,7 @@ export default function EditEmployee() {
         setEmployee(data.employee);
         setSelectedCourses(data.employee.f_Course.map((course) => course._id));
         setPreviewUrl(data.employee.f_Image);
-        setImageState(
+        setAvatarState(
           data.employee.f_Image ===
             "https://demofree.sirv.com/nope-not-here.jpg"
             ? "deleted"
@@ -65,7 +65,7 @@ export default function EditEmployee() {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-      setImageState("new");
+      setAvatarState("new");
     } else {
       alert("Only JPG/PNG files are allowed");
     }
@@ -86,7 +86,7 @@ export default function EditEmployee() {
     setSelectedFile(null);
     setSelectedFileName("");
     setPreviewUrl(null);
-    setImageState("deleted");
+    setAvatarState("deleted");
     if (employee) {
       setEmployee({ ...employee, f_Image: "" });
     }
@@ -107,10 +107,14 @@ export default function EditEmployee() {
     formData.append("f_Designation", employee.f_Designation);
     formData.append("f_Gender", employee.f_Gender);
     formData.append("f_Course", JSON.stringify(selectedCourses));
+    formData.append(
+      "avatarState",
+      avatarState === "deleted" ? "true" : "false"
+    );
     if (selectedFile) {
       formData.append("f_Image", selectedFile);
     }
-    if (imageState === "deleted") {
+    if (avatarState === "deleted") {
       formData.append("delete_image", "true");
     }
 
@@ -147,8 +151,8 @@ export default function EditEmployee() {
   return (
     <div className="flex flex-col items-center p-4">
       <h1 className="mb-4 text-2xl font-bold">Edit Employee</h1>
-      {imageState === "deleted" && <p className="text-red-500">No Image</p>}
-      {previewUrl && imageState !== "deleted" && (
+      {avatarState === "deleted" && <p className="text-red-500">No Image</p>}
+      {previewUrl && avatarState !== "deleted" && (
         <div className="mb-4 rounded-full h-32 w-32 relative">
           <img
             src={previewUrl}
