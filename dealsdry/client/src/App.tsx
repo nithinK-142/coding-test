@@ -3,6 +3,7 @@ import { useContext } from "react";
 import Header from "./components/Header";
 import { AuthContext, AuthContextProvider } from "./context/auth-context";
 import { CourseProvider } from "./context/course-context";
+import { EmployeeProvider } from "./context/employee-context";
 
 function AuthenticatedApp() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -18,7 +19,9 @@ function App() {
   return (
     <AuthContextProvider>
       <CourseProvider>
-        <AuthenticatedApp />
+        <EmployeeProvider>
+          <AuthenticatedApp />
+        </EmployeeProvider>
       </CourseProvider>
     </AuthContextProvider>
   );

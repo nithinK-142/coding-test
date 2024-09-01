@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/auth-context";
 
-const CreateAdmin = () => {
+export default function CreateAdmin() {
   const [credentials, setCredentials] = useState({
     f_userName: "",
     f_Pwd: "",
@@ -92,6 +92,4 @@ const CreateAdmin = () => {
       </div>
     </div>
   );
-};
-
-export default CreateAdmin;
+}

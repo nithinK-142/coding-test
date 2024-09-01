@@ -1,11 +1,12 @@
-import axios from "axios";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IEmployee } from "./EmployeeList";
+import { useEmployeeContext } from "@/context/employee-context";
 import { useCourseContext } from "@/context/course-context";
+import { IEmployee } from "@/constants";
 
 export default function CreateEmployee() {
   const navigate = useNavigate();
+  const { createEmployee } = useEmployeeContext();
   const { courses, sortCourses } = useCourseContext();
 
   const [employee, setEmployee] = useState<
@@ -79,23 +80,12 @@ export default function CreateEmployee() {
     }
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("Response:", response.data);
+      await createEmployee(formData);
       navigate("/employees-list");
     } catch (error: any) {
-      setError(error.response.data.errors[0].msg);
-      alert(error.response.data.errors[0].msg);
-      console.error(error.response.data.errors[0].msg);
+      setError(error.response?.data?.errors[0]?.msg || "An error occurred");
     } finally {
-      setTimeout(() => setError(""), 2000);
+      setTimeout(() => setError(null), 2000);
     }
   };
 

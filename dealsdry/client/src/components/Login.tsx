@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "@/context/auth-context";
 
-const Login = () => {
+export default function Login() {
   const [credentials, setCredentials] = useState({
     f_UserName: "",
     f_Pwd: "",
@@ -97,6 +97,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login;
+}

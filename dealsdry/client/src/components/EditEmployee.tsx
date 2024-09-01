@@ -1,13 +1,13 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { IEmployee } from "./EmployeeList";
+import { useEmployeeContext } from "@/context/employee-context";
 import { useCourseContext } from "@/context/course-context";
+import { AvatarStateType, IEmployee, NOT_FOUND_URL } from "@/constants";
 
 export default function EditEmployee() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
+  const { updateEmployee, getEmployeeById } = useEmployeeContext();
   const { courses, sortCourses } = useCourseContext();
   const [employee, setEmployee] = useState<IEmployee | null>(null);
   const [loading, setLoading] = useState(true);
@@ -16,35 +16,30 @@ export default function EditEmployee() {
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [avatarState, setAvatarState] = useState<
-    "existing" | "new" | "deleted"
-  >("existing");
+  const [avatarState, setAvatarState] = useState<AvatarStateType>("existing");
 
   useEffect(() => {
-    async function getEmployeeDetails() {
-      try {
-        const { data } = await axios.get<{ employee: IEmployee }>(
-          `${import.meta.env.VITE_API_URL}/${id}`
-        );
-        setEmployee(data.employee);
-        setSelectedCourses(data.employee.f_Course.map((course) => course._id));
-        setPreviewUrl(data.employee.f_Image);
-        setAvatarState(
-          data.employee.f_Image ===
-            "https://demofree.sirv.com/nope-not-here.jpg"
-            ? "deleted"
-            : "existing"
-        );
-      } catch (error) {
-        setError("Failed to fetch employee details.");
-        console.error(error);
-      } finally {
-        setLoading(false);
+    async function fetchEmployeeDetails() {
+      if (id) {
+        try {
+          const employeeData = await getEmployeeById(id);
+          setEmployee(employeeData);
+          setSelectedCourses(employeeData.f_Course.map((course) => course._id));
+          setPreviewUrl(employeeData.f_Image);
+          setAvatarState(
+            employeeData.f_Image === NOT_FOUND_URL ? "deleted" : "existing"
+          );
+        } catch (error) {
+          setError("Failed to fetch employee details.");
+          console.error(error);
+        } finally {
+          setLoading(false);
+        }
       }
     }
 
-    getEmployeeDetails();
-  }, [id]);
+    fetchEmployeeDetails();
+  }, [id, getEmployeeById]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -95,7 +90,7 @@ export default function EditEmployee() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!employee) {
+    if (!employee || !id) {
       setError("No employee data available.");
       return;
     }
@@ -119,16 +114,7 @@ export default function EditEmployee() {
     }
 
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/${id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log("Response:", response.data);
+      await updateEmployee(id, formData);
       navigate("/employees-list");
     } catch (error) {
       setError("Failed to update employee details.");

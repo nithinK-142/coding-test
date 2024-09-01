@@ -1,49 +1,18 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-export interface IEmployee {
-  _id: string;
-  f_Image: string;
-  f_Name: string;
-  f_Email: string;
-  f_Mobile: string;
-  f_Designation: string;
-  f_Gender: string;
-  f_Course: {
-    _id: string;
-    f_CourseName: string;
-  }[];
-  f_CreatedAt: Date;
-}
+import { useEmployeeContext } from "@/context/employee-context";
 
 export default function EmployeeList() {
-  const [employees, setEmployees] = useState<IEmployee[]>([]);
+  const { employees, deleteEmployee } = useEmployeeContext();
 
-  async function getEmployees() {
+  const handleDelete = async (id: string) => {
     try {
-      const { data } = await axios.get(import.meta.env.VITE_API_URL);
-      setEmployees(data.employees);
+      await deleteEmployee(id);
+      alert("Employee deleted successfully");
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting employee:", error);
+      alert("Failed to delete employee");
     }
-  }
-
-  async function handleDelete(id: string) {
-    try {
-      const { data } = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/${id}`
-      );
-      getEmployees();
-      alert(data.message);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    getEmployees();
-  }, []);
+  };
 
   return (
     <div>
