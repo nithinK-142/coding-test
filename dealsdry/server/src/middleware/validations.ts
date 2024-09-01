@@ -19,7 +19,7 @@ export const employeeValidation = [
 
 export const createEmployeeValidation = [
   ...employeeValidation,
-  body("f_Image_file").custom((value, { req }) => {
+  body("f_Image").custom((value, { req }) => {
     if (req.file && !["image/jpeg", "image/png"].includes(req.file.mimetype)) {
       throw new Error("Invalid file type. Only JPG and PNG are allowed.");
     }
@@ -29,7 +29,7 @@ export const createEmployeeValidation = [
 
 export const editEmployeeValidation = [
   ...employeeValidation,
-  body("f_Image_file")
+  body("f_Image")
     .optional()
     .custom((value, { req }) => {
       if (

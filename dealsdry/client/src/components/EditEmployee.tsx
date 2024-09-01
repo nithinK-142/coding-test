@@ -23,14 +23,15 @@ export default function EditEmployee() {
   useEffect(() => {
     async function getEmployeeDetails() {
       try {
-        const { data } = await axios.get<IEmployee>(
+        const { data } = await axios.get<{ employee: IEmployee }>(
           `${import.meta.env.VITE_API_URL}/${id}`
         );
-        setEmployee(data);
-        setSelectedCourses(data.f_Course.split(",").sort());
-        setPreviewUrl(data.f_Image);
+        setEmployee(data.employee);
+        setSelectedCourses(data.employee.f_Course.map((course) => course._id));
+        setPreviewUrl(data.employee.f_Image);
         setImageState(
-          data.f_Image === "https://demofree.sirv.com/nope-not-here.jpg"
+          data.employee.f_Image ===
+            "https://demofree.sirv.com/nope-not-here.jpg"
             ? "deleted"
             : "existing"
         );
@@ -100,15 +101,14 @@ export default function EditEmployee() {
     }
 
     const formData = new FormData();
-    formData.append("f_Id", employee.f_Id.toString());
     formData.append("f_Name", employee.f_Name);
     formData.append("f_Email", employee.f_Email);
     formData.append("f_Mobile", employee.f_Mobile);
     formData.append("f_Designation", employee.f_Designation);
-    formData.append("f_gender", employee.f_gender);
-    formData.append("f_Course", selectedCourses.join(","));
+    formData.append("f_Gender", employee.f_Gender);
+    formData.append("f_Course", JSON.stringify(selectedCourses));
     if (selectedFile) {
-      formData.append("f_Image_file", selectedFile);
+      formData.append("f_Image", selectedFile);
     }
     if (imageState === "deleted") {
       formData.append("delete_image", "true");
@@ -235,16 +235,16 @@ export default function EditEmployee() {
           <label className="block mb-2">Course:</label>
           <div className="flex flex-wrap">
             {sortCourses(courses).map((course) => (
-              <label key={course} className="mr-4">
+              <label key={course._id} className="mr-4">
                 <input
                   type="checkbox"
                   name="f_Course"
-                  value={course}
-                  checked={selectedCourses.includes(course)}
+                  value={course._id}
+                  checked={selectedCourses.includes(course._id)}
                   onChange={handleCourseChange}
                   className="mr-2"
                 />
-                {course}
+                {course.f_CourseName}
               </label>
             ))}
           </div>
@@ -261,9 +261,9 @@ export default function EditEmployee() {
               <label className="mr-4">
                 <input
                   type="radio"
-                  name="f_gender"
+                  name="f_Gender"
                   value="Male"
-                  checked={employee.f_gender === "Male"}
+                  checked={employee.f_Gender === "Male"}
                   onChange={handleInputChange}
                   className="mr-2"
                 />
@@ -272,9 +272,9 @@ export default function EditEmployee() {
               <label>
                 <input
                   type="radio"
-                  name="f_gender"
+                  name="f_Gender"
                   value="Female"
-                  checked={employee.f_gender === "Female"}
+                  checked={employee.f_Gender === "Female"}
                   onChange={handleInputChange}
                   className="mr-2"
                 />

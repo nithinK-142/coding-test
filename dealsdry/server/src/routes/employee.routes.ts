@@ -19,14 +19,14 @@ router.get("/employees/:id", getEmployee);
 router.get("/employees", getEmployees);
 router.post(
   "/employees",
-  upload.single("f_Image_file"),
+  upload.single("f_Image"),
   createEmployeeValidation,
   validate,
   createEmployee
 );
 router.put(
   "/employees/:id",
-  upload.single("f_Image_file"),
+  upload.single("f_Image"),
   editEmployeeValidation,
   validate,
   editEmployee

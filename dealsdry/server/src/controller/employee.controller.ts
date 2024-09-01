@@ -28,8 +28,12 @@ export const getEmployees = async (_req: Request, res: Response) => {
 
 export const createEmployee = async (req: Request, res: Response) => {
   try {
-    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_CourseId } =
+    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_Course } =
       req.body;
+
+    const f_Course_Parsed =
+      typeof f_Course === "string" ? JSON.parse(f_Course) : f_Course;
+
     const f_Image = req.file
       ? `http://localhost:3001/public/temp/${req.file.filename}`
       : undefined;
@@ -40,15 +44,31 @@ export const createEmployee = async (req: Request, res: Response) => {
       !f_Mobile ||
       !f_Designation ||
       !f_Gender ||
-      !f_CourseId
+      !f_Course ||
+      !Array.isArray(f_Course_Parsed) ||
+      f_Course_Parsed.length === 0
     ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const course = await CourseModel.findById(f_CourseId);
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+    const courses = await CourseModel.find({
+      _id: {
+        $in: f_Course_Parsed.map(
+          (course: string) => new mongoose.Types.ObjectId(course)
+        ),
+      },
+    });
+
+    if (courses.length !== f_Course_Parsed.length) {
+      return res
+        .status(404)
+        .json({ message: "Some courses not found or invalid" });
     }
+
+    const courseDetails = courses.map((course) => ({
+      _id: course._id,
+      f_CourseName: course.f_CourseName,
+    }));
 
     const newEmployee: IEmployee = new EmployeeModel({
       _id: new mongoose.Types.ObjectId(),
@@ -58,10 +78,7 @@ export const createEmployee = async (req: Request, res: Response) => {
       f_Mobile,
       f_Designation,
       f_Gender,
-      f_Course: {
-        _id: course._id,
-        f_CourseName: course.f_CourseName,
-      },
+      f_Course: courseDetails,
     });
 
     await newEmployee.save();
@@ -76,26 +93,38 @@ export const createEmployee = async (req: Request, res: Response) => {
 export const editEmployee = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_CourseId } =
+    const { f_Name, f_Email, f_Mobile, f_Designation, f_Gender, f_Course } =
       req.body;
-    const f_Image = req.file
-      ? `http://localhost:3001/public/temp/${req.file.filename}`
-      : undefined;
+    const f_Image = !req.file
+      ? "https://demofree.sirv.com/nope-not-here.jpg"
+      : `http://localhost:3001/public/temp/${req.file.filename}`;
 
     const employee = await EmployeeModel.findById(id);
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
 
-    if (f_CourseId && f_CourseId !== employee.f_Course._id.toString()) {
-      const course = await CourseModel.findById(f_CourseId);
-      if (!course) {
-        return res.status(404).json({ message: "Course not found" });
+    if (f_Course) {
+      const f_Course_Parsed =
+        typeof f_Course === "string" ? JSON.parse(f_Course) : f_Course;
+      const courses = await CourseModel.find({
+        _id: {
+          $in: f_Course_Parsed.map(
+            (course: string) => new mongoose.Types.ObjectId(course)
+          ),
+        },
+      });
+
+      if (courses.length !== f_Course_Parsed.length) {
+        return res
+          .status(404)
+          .json({ message: "Some courses not found or invalid" });
       }
-      employee.f_Course = {
+
+      employee.f_Course = courses.map((course) => ({
         _id: course._id,
         f_CourseName: course.f_CourseName,
-      };
+      }));
     }
 
     if (f_Name) employee.f_Name = f_Name;

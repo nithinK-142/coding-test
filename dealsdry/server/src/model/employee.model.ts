@@ -11,7 +11,7 @@ export interface IEmployee extends Document {
   f_Course: {
     _id: mongoose.Types.ObjectId;
     f_CourseName: string;
-  };
+  }[];
   f_CreatedAt: Date;
 }
 
@@ -23,14 +23,16 @@ const EmployeeSchema: Schema = new Schema({
   f_Mobile: { type: String, required: true },
   f_Designation: { type: String, required: true },
   f_Gender: { type: String, required: true },
-  f_Course: {
-    _id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Course",
-      required: true,
+  f_Course: [
+    {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        required: true,
+      },
+      f_CourseName: { type: String, required: true },
     },
-    f_CourseName: { type: String, required: true },
-  },
+  ],
   f_CreatedAt: { type: Date, default: Date.now },
 });
 

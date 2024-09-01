@@ -6,18 +6,17 @@ import { useCourseContext } from "@/context/course-context";
 
 export default function CreateEmployee() {
   const navigate = useNavigate();
-
   const { courses, sortCourses } = useCourseContext();
-  const [employee, setEmployee] = useState<IEmployee>({
-    f_Id: 0,
+
+  const [employee, setEmployee] = useState<
+    Omit<IEmployee, "_id" | "f_Course" | "f_CreatedAt">
+  >({
     f_Image: "",
     f_Name: "",
     f_Email: "",
     f_Mobile: "",
     f_Designation: "",
-    f_gender: "",
-    f_Course: "",
-    f_Createdate: new Date(),
+    f_Gender: "",
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -59,7 +58,9 @@ export default function CreateEmployee() {
     if (checked) {
       setSelectedCourses([...selectedCourses, value]);
     } else {
-      setSelectedCourses(selectedCourses.filter((course) => course !== value));
+      setSelectedCourses(
+        selectedCourses.filter((courseId) => courseId !== value)
+      );
     }
   };
 
@@ -71,10 +72,10 @@ export default function CreateEmployee() {
     formData.append("f_Email", employee.f_Email);
     formData.append("f_Mobile", employee.f_Mobile);
     formData.append("f_Designation", employee.f_Designation);
-    formData.append("f_gender", employee.f_gender);
-    formData.append("f_Course", selectedCourses.join(","));
+    formData.append("f_Gender", employee.f_Gender);
+    formData.append("f_Course", JSON.stringify(selectedCourses));
     if (selectedFile) {
-      formData.append("f_Image_file", selectedFile);
+      formData.append("f_Image", selectedFile);
     }
 
     try {
@@ -201,15 +202,15 @@ export default function CreateEmployee() {
           <label className="block mb-2">Course:</label>
           <div className="flex">
             {sortCourses(courses).map((course) => (
-              <label key={course} className="mr-4">
+              <label key={course._id} className="mr-4">
                 <input
                   type="checkbox"
                   name="f_Course"
-                  value={course}
+                  value={course._id}
                   onChange={handleCourseChange}
                   className="mr-2"
                 />
-                {course}
+                {course.f_CourseName}
               </label>
             ))}
           </div>
@@ -222,9 +223,9 @@ export default function CreateEmployee() {
               <label className="mr-4">
                 <input
                   type="radio"
-                  name="f_gender"
+                  name="f_Gender"
                   value="Male"
-                  checked={employee.f_gender === "Male"}
+                  checked={employee.f_Gender === "Male"}
                   onChange={handleInputChange}
                   className="mr-2"
                 />
@@ -233,9 +234,9 @@ export default function CreateEmployee() {
               <label>
                 <input
                   type="radio"
-                  name="f_gender"
+                  name="f_Gender"
                   value="Female"
-                  checked={employee.f_gender === "Female"}
+                  checked={employee.f_Gender === "Female"}
                   onChange={handleInputChange}
                   className="mr-2"
                 />
