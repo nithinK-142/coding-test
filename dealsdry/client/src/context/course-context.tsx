@@ -15,10 +15,20 @@ interface ICourse {
   f_CreatedAt: string;
 }
 
+type MessageType = {
+  message: string;
+  isError: boolean;
+};
+
+const messageDefault: MessageType = {
+  message: "",
+  isError: false,
+};
+
 interface ICourseContext {
   courses: ICourse[];
   loading: boolean;
-  error: string;
+  message: MessageType;
   fetchCourses: () => Promise<void>;
   addCourse: (newCourseName: string) => Promise<void>;
   deleteCourse: (courseId: string) => Promise<void>;
@@ -29,7 +39,7 @@ interface ICourseContext {
 const CourseContext = createContext<ICourseContext>({
   courses: [],
   loading: false,
-  error: "",
+  message: messageDefault,
   fetchCourses: () => Promise.resolve(),
   addCourse: () => Promise.resolve(),
   deleteCourse: () => Promise.resolve(),
@@ -42,49 +52,83 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [courses, setCourses] = useState<ICourse[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [message, setMessage] = useState<MessageType>(messageDefault);
+
+  const resetMessage = useCallback(() => {
+    setTimeout(() => {
+      setMessage(messageDefault);
+    }, 2000);
+  }, []);
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
       const { data } = await axios.get<{ courses: ICourse[] }>(API_BASE_URL);
       setCourses(data.courses);
-      setError("");
     } catch (error) {
-      console.error(error);
-      setError("Failed to fetch courses");
+      console.error("Error fetching courses:", error);
+      setMessage({
+        message: "Failed to fetch courses, please try again later.",
+        isError: true,
+      });
     } finally {
       setLoading(false);
+      resetMessage();
     }
-  }, []);
+  }, [resetMessage]);
 
-  const addCourse = useCallback(async (newCourseName: string) => {
-    if (!newCourseName.trim()) return;
-    try {
-      const { data } = await axios.post<{ courses: ICourse[] }>(API_BASE_URL, {
-        f_CourseName: newCourseName,
-      });
-      setCourses(data.courses);
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Failed to add course");
-    } finally {
-      setTimeout(() => setError(""), 2000);
-    }
-  }, []);
+  const addCourse = useCallback(
+    async (newCourseName: string) => {
+      if (!newCourseName.trim()) return;
+      try {
+        const { data } = await axios.post<{ courses: ICourse[] }>(
+          API_BASE_URL,
+          {
+            f_CourseName: newCourseName,
+          }
+        );
+        setCourses(data.courses);
+        setMessage({
+          message: "Course added successfully",
+          isError: false,
+        });
+      } catch (error: any) {
+        console.error("Error adding course:", error);
+        setMessage({
+          message: error.response?.data?.message || "Failed to add course",
+          isError: true,
+        });
+      } finally {
+        resetMessage();
+      }
+    },
+    [resetMessage]
+  );
 
-  const deleteCourse = useCallback(async (courseId: string) => {
-    try {
-      const { data } = await axios.delete<{ courses: ICourse[] }>(
-        API_BASE_URL,
-        { data: { courseId } }
-      );
-      setCourses(data.courses);
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Failed to delete course");
-    } finally {
-      setTimeout(() => setError(""), 2000);
-    }
-  }, []);
+  const deleteCourse = useCallback(
+    async (courseId: string) => {
+      try {
+        const { data } = await axios.delete<{ courses: ICourse[] }>(
+          API_BASE_URL,
+          { data: { courseId } }
+        );
+        setCourses(data.courses);
+        setMessage({
+          message: "Course deleted successfully",
+          isError: false,
+        });
+      } catch (error: any) {
+        console.error("Error deleting course:", error);
+        setMessage({
+          message: error.response?.data?.message || "Failed to delete course",
+          isError: true,
+        });
+      } finally {
+        resetMessage();
+      }
+    },
+    [resetMessage]
+  );
 
   const updateCourse = useCallback(
     async (courseId: string, newCourseName: string) => {
@@ -94,13 +138,21 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
           newCourseName,
         });
         setCourses(data.courses);
+        setMessage({
+          message: "Course updated successfully",
+          isError: false,
+        });
       } catch (error: any) {
-        setError(error.response?.data?.message || "Failed to update course");
+        console.error("Error updating course:", error);
+        setMessage({
+          message: error.response?.data?.message || "Failed to update course",
+          isError: true,
+        });
       } finally {
-        setTimeout(() => setError(""), 2000);
+        resetMessage();
       }
     },
-    []
+    [resetMessage]
   );
 
   const sortCourses = useCallback((courses: ICourse[]) => {
@@ -118,7 +170,7 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         courses,
         loading,
-        error,
+        message,
         fetchCourses,
         addCourse,
         deleteCourse,
@@ -133,7 +185,7 @@ export const CourseProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useCourseContext = () => {
   const context = useContext(CourseContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useCourseContext must be used within a CourseProvider");
   }
   return context;

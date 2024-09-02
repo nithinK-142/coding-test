@@ -8,7 +8,7 @@ interface ICourse {
 }
 
 export default function CourseList() {
-  const { courses, loading, error, addCourse, deleteCourse, updateCourse } =
+  const { courses, loading, message, addCourse, deleteCourse, updateCourse } =
     useCourseContext();
 
   const [newCourse, setNewCourse] = useState<string>("");
@@ -59,8 +59,14 @@ export default function CourseList() {
         >
           Sort Alphabetically
         </button> */}
-        {error && (
-          <div className="p-2 text-white bg-red-500 rounded-md">{error}</div>
+        {message.message && (
+          <div
+            className={`p-2 text-white rounded-md ${
+              message.isError ? "bg-red-500" : "bg-green-500"
+            }`}
+          >
+            {message.message}
+          </div>
         )}
         <ul className="space-y-2">
           {courses.map((course: ICourse, index: number) => (
