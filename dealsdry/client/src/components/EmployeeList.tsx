@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEmployeeContext } from "@/context/employee-context";
+import { colNames } from "@/constants";
 
 export default function EmployeeList() {
   const { employees, deleteEmployee } = useEmployeeContext();
@@ -17,23 +18,23 @@ export default function EmployeeList() {
   return (
     <div>
       <div className="flex justify-center gap-[10rem] py-4">
-        <div>Total count: {employees.length}</div>
-        <Link to="/create-employee">Create Employee</Link>
+        <div className="px-2 py-1.5 rounded-md bg-stone-600">
+          Employees:{employees.length}
+        </div>
+        <Link
+          to="/create-employee"
+          className="px-4 py-1.5 hover:bg-white rounded-md hover:transition-colors hover:duration-500 hover:text-black hover:ease-in-out"
+        >
+          Create Employee
+        </Link>
       </div>
       <div>
         <table className="min-w-full bg-gray-600 border border-gray-300">
           <thead>
             <tr>
-              <th className="px-4 py-2 border-b">ID</th>
-              <th className="px-4 py-2 border-b">Image</th>
-              <th className="px-4 py-2 border-b">Name</th>
-              <th className="px-4 py-2 border-b">Email</th>
-              <th className="px-4 py-2 border-b">Mobile</th>
-              <th className="px-4 py-2 border-b">Designation</th>
-              <th className="px-4 py-2 border-b">Gender</th>
-              <th className="px-4 py-2 border-b">Courses</th>
-              <th className="px-4 py-2 border-b">Created Date</th>
-              <th className="px-4 py-2 border-b">Action</th>
+              {colNames.map((col) => (
+                <th className="px-4 py-2 border-b">{col}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -72,8 +73,16 @@ export default function EmployeeList() {
                 </td>
                 <td className="px-4 py-2 border-b">
                   <div className="flex justify-center space-x-4">
-                    <Link to={`/edit-employee/${employee._id}`}>Edit</Link>
-                    <button onClick={() => handleDelete(employee._id)}>
+                    <Link
+                      to={`/edit-employee/${employee._id}`}
+                      className="hover:bg-yellow-500 px-2 rounded-md"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(employee._id)}
+                      className="hover:bg-red-500 px-2 rounded-md"
+                    >
                       Delete
                     </button>
                   </div>

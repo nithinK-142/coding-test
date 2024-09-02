@@ -31,3 +31,16 @@ export const navLinks = [
     name: "CourseList",
   },
 ];
+
+export const colNames = [
+  "ID",
+  "Image",
+  "Name",
+  "Email",
+  "Mobile",
+  "Designation",
+  "Gender",
+  "Courses",
+  "Created",
+  "Action",
+];

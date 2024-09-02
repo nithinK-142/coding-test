@@ -36,23 +36,30 @@ export default function CourseList() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="w-full max-w-md p-4 mx-auto border rounded-md">
+    <div className="w-full max-w-md p-4 mx-auto rounded-md mt-6">
       <div className="space-y-4">
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={newCourse}
-            onChange={(e) => setNewCourse(e.target.value)}
-            placeholder="Enter new course"
-            className="w-full p-2 text-black border rounded-md"
-          />
-          <button
-            onClick={handleAddCourse}
-            className="p-2 text-white bg-blue-500 rounded-md"
-          >
-            Add Course
-          </button>
-        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleAddCourse();
+          }}
+        >
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={newCourse}
+              onChange={(e) => setNewCourse(e.target.value)}
+              placeholder="Enter new course"
+              className="flex-grow p-2 text-black border rounded-md"
+            />
+            <button
+              type="submit"
+              className="p-2 text-white bg-blue-500 rounded-md"
+            >
+              Add Course
+            </button>
+          </div>
+        </form>
         {/* <button
           onClick={sortCourses}
           className="w-full p-2 text-white bg-green-500 rounded-md"
@@ -72,7 +79,7 @@ export default function CourseList() {
           {courses.map((course: ICourse, index: number) => (
             <li
               key={course._id}
-              className="flex items-center justify-between p-2 border rounded-md"
+              className="flex items-center justify-between p-2 border border-gray-400 border-opacity-50 rounded-md"
             >
               {editingCourse && editingCourse.id === course._id ? (
                 <input

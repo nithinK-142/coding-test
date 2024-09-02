@@ -30,15 +30,18 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col justify-center w-full min-h-screen py-12 bg-gray-100 sm:px-6 lg:px-8">
+    <div className="flex flex-col justify-center w-full min-h-screen py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-3xl font-extrabold text-center text-gray-900">
-          Login
-        </h2>
+        <h1 className="text-3xl font-bold text-center">
+          Dealsdray Admin Panel
+        </h1>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
+          <h2 className=" text-2xl font-extrabold text-center text-black">
+            Login
+          </h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label

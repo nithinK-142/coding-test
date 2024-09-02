@@ -16,7 +16,7 @@ export default function Header() {
   }, [navigate]);
 
   return (
-    <nav className="flex justify-between gap-40 px-20 py-6 border">
+    <nav className="flex justify-between gap-40 px-20 py-6 border border-gray-600 border-opacity-90 rounded-md">
       {navLinks.map((link) => (
         <Link
           to={link.path}
