@@ -25,7 +25,7 @@ export default function CreateAdmin() {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen py-12 bg-[#212121] sm:px-6 lg:px-8">
+    <div className="flex flex-col w-full py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-3xl font-extrabold text-center text-white">
           Create Admin

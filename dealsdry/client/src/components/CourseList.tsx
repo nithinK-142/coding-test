@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCourseContext } from "@/context/course-context";
 
 interface ICourse {
@@ -16,6 +16,19 @@ export default function CourseList() {
     id: string;
     value: string;
   } | null>(null);
+
+  const addInputRef = useRef<HTMLInputElement | null>(null);
+  const editInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (editingCourse && editInputRef.current) {
+      editInputRef.current.focus();
+    }
+  }, [editingCourse]);
+
+  useEffect(() => {
+    addInputRef.current?.focus();
+  }, []);
 
   const handleAddCourse = () => {
     addCourse(newCourse);
@@ -46,6 +59,7 @@ export default function CourseList() {
         >
           <div className="flex space-x-2">
             <input
+              ref={addInputRef}
               type="text"
               value={newCourse}
               onChange={(e) => setNewCourse(e.target.value)}
@@ -79,10 +93,16 @@ export default function CourseList() {
           {courses.map((course: ICourse, index: number) => (
             <li
               key={course._id}
-              className="flex items-center justify-between p-2 border border-gray-400 border-opacity-50 rounded-md"
+              className={`flex items-center justify-between p-2 border rounded-md
+              ${
+                editingCourse?.id === course._id
+                  ? "border-opacity-70"
+                  : "border-gray-400 border-opacity-50"
+              }`}
             >
               {editingCourse && editingCourse.id === course._id ? (
                 <input
+                  ref={editInputRef}
                   type="text"
                   value={editingCourse.value}
                   onChange={(e) =>
@@ -91,7 +111,7 @@ export default function CourseList() {
                       value: e.target.value,
                     })
                   }
-                  className="w-full p-1 mr-2 text-black border rounded-md"
+                  className="w-full p-1 mr-2 rounded-md border-none outline-none bg-black"
                 />
               ) : (
                 <div>
