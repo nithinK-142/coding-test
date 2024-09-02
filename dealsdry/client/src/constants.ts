@@ -16,3 +16,18 @@ export type IEmployee = {
   }[];
   f_CreatedAt: Date;
 };
+
+export const navLinks = [
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+  },
+  {
+    path: "/employees-list",
+    name: "EmployeesList",
+  },
+  {
+    path: "/course-list",
+    name: "CourseList",
+  },
+];
