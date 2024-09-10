@@ -1,8 +1,25 @@
-function App() {
+import { AuthContext, AuthContextProvider } from "./context/auth-context";
+import { Outlet } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import { useContext } from "react";
+
+function AuthenticatedApp() {
+  const { isAuthenticated } = useContext(AuthContext);
   return (
-    <main className="flex flex-col items-center text-center">
-      <h1 className="text-xl font-semibold">Prexo</h1>
-    </main>
+    <div className="app-container">
+      {isAuthenticated && <Sidebar />}
+      <main>
+        <Outlet />
+      </main>
+    </div>
   );
 }
+function App() {
+  return (
+    <AuthContextProvider>
+      <AuthenticatedApp />
+    </AuthContextProvider>
+  );
+}
+
 export default App;
