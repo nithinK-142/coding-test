@@ -62,13 +62,7 @@ const LoginForm: React.FC<LoginFormProps> = memo(
         onChange={onChange}
         sx={{ marginBottom: "3vh" }}
       />
-      <Button
-        type="submit"
-        variant="contained"
-        color="info"
-        fullWidth
-        sx={{ mt: 2 }}
-      >
+      <Button type="submit" variant="contained" color="info" sx={{ mt: 2 }}>
         Login
       </Button>
     </Box>

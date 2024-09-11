@@ -5,23 +5,28 @@ import { useContext } from "react";
 import { Box } from "@mui/material";
 import BreadCrumbs from "./components/BreadCrumbs";
 import { PathContextProvider } from "./context/path-context";
+import Navbar from "./components/Navbar";
 
 function AuthenticatedApp() {
   const { isAuthenticated } = useContext(AuthContext);
 
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+      {/* Sidebar */}
       {isAuthenticated && (
         <Box
           sx={{
-            width: 240,
-            backgroundColor: "#2c3e50",
-            borderRight: "1px solid #ddd",
+            width: 250,
+            height: "100%",
+            backgroundColor: "#152238",
+            color: "#ecf0f1",
             position: "fixed",
             top: 0,
             left: 0,
             bottom: 0,
             overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Sidebar />
@@ -31,14 +36,25 @@ function AuthenticatedApp() {
         sx={{
           flex: 1,
           marginLeft: isAuthenticated ? 30 : 0,
-          padding: isAuthenticated ? 4 : 0,
+          // padding: isAuthenticated ? 2 : 0,
+          // paddingTop: 0,
           overflowY: "auto",
           overflowX: "hidden",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <div>
+        {isAuthenticated && <Navbar />}
+        <Box
+          sx={{
+            padding: isAuthenticated ? 2 : 0,
+            paddingBlock: isAuthenticated ? 3 : 0,
+            overflowY: "auto",
+            overflowX: "hidden",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {isAuthenticated && <BreadCrumbs />}
           <Box
             sx={{
@@ -52,7 +68,7 @@ function AuthenticatedApp() {
           >
             <Outlet />
           </Box>
-        </div>
+        </Box>
       </Box>
     </Box>
   );

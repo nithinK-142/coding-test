@@ -71,12 +71,25 @@ export default function Delivery() {
         display: "flex",
         flexDirection: "column",
         overflow: "auto",
-        p: 2,
+        p: 1,
       }}
     >
-      <Typography variant="h4" gutterBottom>
-        Delivery CSV Upload
+      <Typography
+        variant="h4"
+        gutterBottom
+        style={{ fontSize: "0.9rem", fontWeight: "bold" }}
+      >
+        Bulk Delivery
       </Typography>
+
+      <Typography
+        variant="h6"
+        gutterBottom
+        style={{ fontSize: "0.9rem", fontWeight: "bold" }}
+      >
+        Upload File
+      </Typography>
+
       <CSVReader
         requiredFields={deliveryRequiredFields}
         onDataValidated={handleDeliveryDataValidated}
