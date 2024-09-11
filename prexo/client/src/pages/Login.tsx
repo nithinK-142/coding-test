@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import logo from "../assets/logo-dark.png";
+import logo from "../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -65,7 +65,7 @@ const LoginForm: React.FC<LoginFormProps> = memo(
       <Button
         type="submit"
         variant="contained"
-        color="error"
+        color="info"
         fullWidth
         sx={{ mt: 2 }}
       >
@@ -118,7 +118,7 @@ export function Login() {
           sx={{
             border: "1px solid #ccc",
             borderRadius: "8px",
-            padding: "2vh",
+            // padding: "2vh",
             paddingTop: "0px",
             bgcolor: "white",
           }}
@@ -131,9 +131,10 @@ export function Login() {
           >
             <Grid item xs={12} sm={4}>
               <Typography variant="h5" align="center">
-                <img src={logo} alt="Logo" height="100" />
+                <img src={logo} alt="Logo" height="150" width="200" />
               </Typography>
             </Grid>
+
             <Grid item xs={12} sm={8} sx={{ padding: "10px" }}>
               <StyledCard>
                 <CardContent>

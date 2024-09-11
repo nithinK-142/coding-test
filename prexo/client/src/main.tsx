@@ -9,10 +9,11 @@ import {
 import App from "./App.tsx";
 import "./index.css";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
-import Login from "./components/Login.tsx";
-import Home from "./components/Home.tsx";
-import Order from "./components/Order.tsx";
-import Delivery from "./components/Delivery.tsx";
+import Login from "./pages/Login.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+import Order from "./pages/Order.tsx";
+import Delivery from "./pages/Delivery.tsx";
+import { NotFound } from "./pages/NotFound.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -21,12 +22,12 @@ const router = createBrowserRouter(
         index
         element={
           <ProtectedRoute>
-            <Home />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
       <Route
-        path="order"
+        path="order/bulk-import"
         element={
           <ProtectedRoute>
             <Order />
@@ -34,7 +35,7 @@ const router = createBrowserRouter(
         }
       />
       <Route
-        path="delivery"
+        path="delivery/bulk-import"
         element={
           <ProtectedRoute>
             <Delivery />
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
         }
       />
       <Route path="login" element={<Login />} />
+      <Route path="*" element={<NotFound />} />
     </Route>
   )
 );

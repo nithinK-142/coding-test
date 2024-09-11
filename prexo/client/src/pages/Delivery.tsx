@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CSVReader from "./CSVReader";
+import CSVReader from "../components/CSVReader";
 import {
   Box,
   Typography,
@@ -68,7 +68,6 @@ export default function Delivery() {
   return (
     <Box
       sx={{
-        height: "100vh",
         display: "flex",
         flexDirection: "column",
         overflow: "auto",
