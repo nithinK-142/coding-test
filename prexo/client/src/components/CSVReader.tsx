@@ -1,14 +1,6 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
-import {
-  Button,
-  Alert,
-  AlertTitle,
-  List,
-  ListItem,
-  ListItemText,
-  Box,
-} from "@mui/material";
+import { Button, Alert, AlertTitle, Box } from "@mui/material";
 
 interface CSVReaderProps {
   requiredFields: readonly string[];
@@ -19,26 +11,21 @@ export default function CSVReader({
   requiredFields,
   onDataValidated,
 }: CSVReaderProps) {
-  const [errors, setErrors] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const validateData = (parsedData: any[]): any[] => {
-    const newErrors: string[] = [];
-    const validData = parsedData.filter((row) => {
-      const missingFields = requiredFields.filter(
-        (field) => !row[field] || row[field].trim() === ""
-      );
-      if (missingFields.length > 0) {
-        newErrors.push(
-          `Row with ID ${
-            row[requiredFields[0]] || "N/A"
-          } is missing: ${missingFields.join(", ")}`
-        );
-        return false;
-      }
-      return true;
-    });
-    setErrors(newErrors);
-    return validData;
+  const validateFields = (headers: string[]): boolean => {
+    const missingFields = requiredFields.filter(
+      (field) => !headers.includes(field)
+    );
+    if (missingFields.length > 0) {
+      setError(`Missing required fields: ${missingFields.join(", ")}`);
+      return false;
+    }
+    return true;
+  };
+
+  const isRowNotEmpty = (row: any): boolean => {
+    return Object.values(row).some((value) => value !== null && value !== "");
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,12 +35,15 @@ export default function CSVReader({
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
-          const validatedData = validateData(results.data);
-          onDataValidated(validatedData);
+          if (validateFields(results.meta.fields || [])) {
+            const filteredData = results.data.filter(isRowNotEmpty);
+            setError(null);
+            onDataValidated(filteredData);
+          }
         },
         error: (error) => {
           console.error("Error while parsing CSV:", error);
-          setErrors(["Error parsing CSV file"]);
+          setError("Error parsing CSV file");
         },
       });
     }
@@ -74,16 +64,10 @@ export default function CSVReader({
         </Button>
       </label>
 
-      {errors.length > 0 && (
+      {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          <AlertTitle>Validation Errors</AlertTitle>
-          <List dense>
-            {errors.map((error, index) => (
-              <ListItem key={index}>
-                <ListItemText primary={error} />
-              </ListItem>
-            ))}
-          </List>
+          <AlertTitle>Validation Error</AlertTitle>
+          {error}
         </Alert>
       )}
     </Box>

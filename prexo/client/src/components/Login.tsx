@@ -1,129 +1,155 @@
-import { useContext, useState } from "react";
+import React, {
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  memo,
+} from "react";
 import { AuthContext } from "../context/auth-context";
-import "./Login.css";
+import {
+  Container,
+  Grid,
+  Box,
+  CardContent,
+  TextField,
+  Button,
+  Card,
+  Typography,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import logo from "../assets/logo-dark.png";
+import { useNavigate } from "react-router-dom";
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  padding: theme.spacing(4),
+  width: "90%",
+  maxWidth: "500px",
+  boxShadow: "none",
+}));
+
+interface Credentials {
+  f_UserName: string;
+  f_Pwd: string;
+}
+
+interface LoginFormProps {
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  credentials: Credentials;
+}
+
+const LoginForm: React.FC<LoginFormProps> = memo(
+  ({ onSubmit, onChange, credentials }) => (
+    <Box component="form" noValidate autoComplete="off" onSubmit={onSubmit}>
+      <TextField
+        type="text"
+        label="Enter Username"
+        variant="standard"
+        fullWidth
+        name="f_UserName"
+        value={credentials.f_UserName}
+        onChange={onChange}
+        sx={{ marginBottom: "3vh" }}
+      />
+      <TextField
+        type="password"
+        label="Enter Password"
+        variant="standard"
+        fullWidth
+        name="f_Pwd"
+        value={credentials.f_Pwd}
+        onChange={onChange}
+        sx={{ marginBottom: "3vh" }}
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        color="error"
+        fullWidth
+        sx={{ mt: 2 }}
+      >
+        Login
+      </Button>
+    </Box>
+  )
+);
 
 export function Login() {
-  const [credentials, setCredentials] = useState({
+  const [credentials, setCredentials] = useState<Credentials>({
     f_UserName: "",
     f_Pwd: "",
   });
 
-  const { login } = useContext(AuthContext);
+  const { login, isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    login(credentials);
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      login(credentials);
+    },
+    [credentials, login]
+  );
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   return (
-    <div>
-      <h1>Login</h1>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          name="f_UserName"
-          value={credentials.f_UserName}
-          onChange={(e) =>
-            setCredentials({ ...credentials, f_UserName: e.target.value })
-          }
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          name="f_Pwd"
-          value={credentials.f_Pwd}
-          onChange={(e) =>
-            setCredentials({ ...credentials, f_Pwd: e.target.value })
-          }
-        />
-
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    <Container>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        style={{ minHeight: "100vh" }}
+      >
+        <Box
+          sx={{
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            padding: "2vh",
+            paddingTop: "0px",
+            bgcolor: "white",
+          }}
+        >
+          <Grid
+            container
+            spacing={1}
+            alignItems="center"
+            sx={{ padding: "20px" }}
+          >
+            <Grid item xs={12} sm={4}>
+              <Typography variant="h5" align="center">
+                <img src={logo} alt="Logo" height="100" />
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={8} sx={{ padding: "10px" }}>
+              <StyledCard>
+                <CardContent>
+                  <LoginForm
+                    onSubmit={handleSubmit}
+                    onChange={handleChange}
+                    credentials={credentials}
+                  />
+                </CardContent>
+              </StyledCard>
+            </Grid>
+          </Grid>
+        </Box>
+      </Grid>
+    </Container>
   );
 }
 
 export default Login;
-
-// import React from "react";
-// import {
-//   Box,
-//   Button,
-//   Card,
-//   CardContent,
-//   TextField,
-//   Typography,
-//   Container,
-// } from "@mui/material";
-// import { Lock as LockIcon } from "lucide-react";
-
-// const LoginPage: React.FC = () => {
-//   return (
-//     <Container
-//       sx={{
-//         display: "flex",
-//         justifyContent: "center",
-//         alignItems: "center",
-//         height: "100vh",
-//         background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-//       }}
-//     >
-//       <Card
-//         sx={{
-//           display: "flex",
-//           maxWidth: 400,
-//           width: "100%",
-//           boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
-//         }}
-//       >
-//         <Box
-//           sx={{
-//             display: "flex",
-//             flexDirection: "column",
-//             justifyContent: "center",
-//             alignItems: "center",
-//             bgcolor: "primary.main",
-//             color: "primary.contrastText",
-//             p: 2,
-//             width: "30%",
-//           }}
-//         >
-//           <LockIcon size={48} />
-//           <Typography variant="h6" sx={{ mt: 2 }}>
-//             Login
-//           </Typography>
-//         </Box>
-//         <CardContent
-//           sx={{
-//             display: "flex",
-//             flexDirection: "column",
-//             justifyContent: "center",
-//             width: "70%",
-//             p: 3,
-//           }}
-//         >
-//           <TextField
-//             label="Username"
-//             variant="outlined"
-//             margin="normal"
-//             fullWidth
-//           />
-//           <TextField
-//             label="Password"
-//             type="password"
-//             variant="outlined"
-//             margin="normal"
-//             fullWidth
-//           />
-//           <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-//             Login
-//           </Button>
-//         </CardContent>
-//       </Card>
-//     </Container>
-//   );
-// };
-
-// export default LoginPage;
