@@ -50,7 +50,15 @@ export default function CSVReader({
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box
+      sx={{
+        p: 2,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <input
         accept=".csv"
         style={{ display: "none" }}
@@ -59,13 +67,13 @@ export default function CSVReader({
         onChange={handleFileUpload}
       />
       <label htmlFor="raised-button-file">
-        <Button variant="contained" component="span" sx={{ mb: 2 }}>
-          Upload CSV
+        <Button variant="contained" component="span" sx={{ fontSize: "12px" }}>
+          Upload File
         </Button>
       </label>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" sx={{ mt: 2 }}>
           <AlertTitle>Validation Error</AlertTitle>
           {error}
         </Alert>

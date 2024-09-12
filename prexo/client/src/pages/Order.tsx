@@ -74,29 +74,68 @@ export default function Order() {
         display: "flex",
         flexDirection: "column",
         overflow: "auto",
-        p: 2,
+        p: 1,
       }}
     >
-      <Typography variant="h4" gutterBottom>
-        Order CSV Upload
+      <Typography
+        variant="h4"
+        gutterBottom
+        style={{ fontSize: "0.9rem", fontWeight: "bold", marginBottom: "1rem" }}
+      >
+        Bulk Order
       </Typography>
-      <CSVReader
-        requiredFields={orderRequiredFields}
-        onDataValidated={handleOrderDataValidated}
-      />
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography
+          variant="h6"
+          gutterBottom
+          style={{ fontSize: "0.9rem", fontWeight: "bold" }}
+        >
+          Upload File
+        </Typography>
+
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#E49B0F",
+              fontSize: "0.8rem",
+              height: "auto",
+            }}
+          >
+            Back to list
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ fontSize: "0.8rem", height: "auto" }}
+          >
+            Download Sample Sheet
+          </Button>
+        </div>
+      </Box>
+
+      <Box sx={{ mx: "auto" }}>
+        <CSVReader
+          requiredFields={orderRequiredFields}
+          onDataValidated={handleOrderDataValidated}
+        />
+      </Box>
       {editedData.length > 0 && (
-        <Box mt={2}>
-          <Typography variant="h6" gutterBottom>
-            Validated Order Data:
-          </Typography>
+        <Box sx={{ mx: "auto", borderRadius: "4px" }}>
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 600, overflow: "auto" }}
+            sx={{ maxHeight: 600, maxWidth: "1250", overflow: "auto" }}
           >
             <Table
               stickyHeader
-              aria-label="order data table"
-              sx={{ minWidth: 2000 }}
+              aria-label="delivery data table"
+              sx={{ minWidth: 2400 }}
             >
               <TableHead>
                 <TableRow>

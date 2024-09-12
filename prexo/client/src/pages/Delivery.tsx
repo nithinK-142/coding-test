@@ -77,31 +77,57 @@ export default function Delivery() {
       <Typography
         variant="h4"
         gutterBottom
-        style={{ fontSize: "0.9rem", fontWeight: "bold" }}
+        style={{ fontSize: "0.9rem", fontWeight: "bold", marginBottom: "1rem" }}
       >
         Bulk Delivery
       </Typography>
 
-      <Typography
-        variant="h6"
-        gutterBottom
-        style={{ fontSize: "0.9rem", fontWeight: "bold" }}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
-        Upload File
-      </Typography>
+        <Typography
+          variant="h6"
+          gutterBottom
+          style={{ fontSize: "0.9rem", fontWeight: "bold" }}
+        >
+          Upload File
+        </Typography>
 
-      <CSVReader
-        requiredFields={deliveryRequiredFields}
-        onDataValidated={handleDeliveryDataValidated}
-      />
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#E49B0F",
+              fontSize: "0.8rem",
+              height: "auto",
+            }}
+          >
+            Back to list
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ fontSize: "0.8rem", height: "auto" }}
+          >
+            Download Sample Sheet
+          </Button>
+        </div>
+      </Box>
+
+      <Box sx={{ mx: "auto" }}>
+        <CSVReader
+          requiredFields={deliveryRequiredFields}
+          onDataValidated={handleDeliveryDataValidated}
+        />
+      </Box>
       {editedData.length > 0 && (
-        <Box mt={2}>
-          <Typography variant="h6" gutterBottom>
-            Validated Delivery Data:
-          </Typography>
+        <Box sx={{ mx: "auto", borderRadius: "4px" }}>
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 600, overflow: "auto" }}
+            sx={{ maxHeight: 600, maxWidth: 1250, overflow: "auto" }}
           >
             <Table
               stickyHeader
