@@ -36,6 +36,10 @@ type DeliveryData = Record<(typeof deliveryRequiredFields)[number], string>;
 export default function Delivery() {
   const [deliveryData, setDeliveryData] = useState<DeliveryData[]>([]);
   const [editedData, setEditedData] = useState<DeliveryData[]>([]);
+  const [activeCell, setActiveCell] = useState<{
+    row: number;
+    field: keyof DeliveryData;
+  } | null>(null);
 
   const handleDeliveryDataValidated = (validData: DeliveryData[]) => {
     setDeliveryData(validData);
@@ -151,22 +155,39 @@ export default function Delivery() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {editedData.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
+                {editedData.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    <TableCell>{rowIndex + 1}</TableCell>
                     {deliveryRequiredFields.map((field) => (
-                      <TableCell key={field} sx={{ padding: "8px 16px" }}>
+                      <TableCell
+                        key={field}
+                        // sx={{
+                        //   padding: "8px 16px",
+                        // }}
+                      >
                         <TextField
                           value={row[field]}
                           onChange={(e) =>
-                            handleCellEdit(index, field, e.target.value)
+                            handleCellEdit(rowIndex, field, e.target.value)
                           }
-                          variant="standard"
+                          variant="outlined"
                           fullWidth
                           InputProps={{
                             disableUnderline: true,
-                            style: { fontSize: "0.875rem" },
+                            style: {
+                              fontSize: "0.875rem",
+                              paddingTop: 0,
+                              borderColor:
+                                activeCell?.row === rowIndex &&
+                                activeCell.field === field
+                                  ? "lightblue"
+                                  : "inherit",
+                            },
                           }}
+                          onFocus={() =>
+                            setActiveCell({ row: rowIndex, field })
+                          }
+                          onBlur={() => setActiveCell(null)}
                         />
                       </TableCell>
                     ))}

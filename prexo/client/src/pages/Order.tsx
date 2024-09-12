@@ -39,6 +39,10 @@ type OrderData = Record<(typeof orderRequiredFields)[number], string>;
 export default function Order() {
   const [orderData, setOrderData] = useState<OrderData[]>([]);
   const [editedData, setEditedData] = useState<OrderData[]>([]);
+  const [activeCell, setActiveCell] = useState<{
+    row: number;
+    field: keyof OrderData;
+  } | null>(null);
 
   const handleOrderDataValidated = (validData: OrderData[]) => {
     setOrderData(validData);
@@ -154,22 +158,38 @@ export default function Order() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {editedData.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
+                {editedData.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    <TableCell>{rowIndex + 1}</TableCell>
                     {orderRequiredFields.map((field) => (
-                      <TableCell key={field} sx={{ padding: "8px 16px" }}>
+                      <TableCell
+                        key={field}
+                        // sx={{
+                        //   padding: "8px 16px",
+                        // }}
+                      >
                         <TextField
                           value={row[field]}
                           onChange={(e) =>
-                            handleCellEdit(index, field, e.target.value)
+                            handleCellEdit(rowIndex, field, e.target.value)
                           }
-                          variant="standard"
+                          variant="outlined"
                           fullWidth
                           InputProps={{
                             disableUnderline: true,
-                            style: { fontSize: "0.875rem" },
+                            style: {
+                              fontSize: "0.875rem",
+                              borderColor:
+                                activeCell?.row === rowIndex &&
+                                activeCell.field === field
+                                  ? "lightblue"
+                                  : "inherit",
+                            },
                           }}
+                          onFocus={() =>
+                            setActiveCell({ row: rowIndex, field })
+                          }
+                          onBlur={() => setActiveCell(null)}
                         />
                       </TableCell>
                     ))}
