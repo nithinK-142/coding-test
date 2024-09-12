@@ -117,22 +117,18 @@ const Bag = () => {
       <Box sx={{ mx: "auto", borderRadius: "4px" }}>
         <TableContainer
           component={Paper}
-          sx={{ maxHeight: 600, maxWidth: 1250, overflow: "auto" }}
+          sx={{ maxHeight: 600, maxWidth: 1300, overflow: "auto" }}
         >
-          <Table
-            stickyHeader
-            aria-label="delivery data table"
-            sx={{ minWidth: 2400 }}
-          >
+          <Table stickyHeader aria-label="delivery data table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold", minWidth: 80 }}>
+                <TableCell sx={{ fontWeight: "bold", minWidth: 50 }}>
                   Sl No
                 </TableCell>
                 {bagRequiredFields.map((field) => (
                   <TableCell
                     key={field}
-                    sx={{ fontWeight: "bold", minWidth: 150 }}
+                    sx={{ fontWeight: "bold", minWidth: 100 }}
                   >
                     {field}
                   </TableCell>

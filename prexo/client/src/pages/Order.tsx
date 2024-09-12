@@ -14,6 +14,7 @@ import {
   Button,
 } from "@mui/material";
 import axios from "axios";
+import { Check, Close } from "@mui/icons-material";
 
 const orderRequiredFields = [
   "Order ID",
@@ -34,11 +35,16 @@ const orderRequiredFields = [
   "Delivery Date",
 ] as const;
 
+// validation not required
+// GEP Order
+// Base Discount
+
 type OrderData = Record<(typeof orderRequiredFields)[number], string>;
 
 export default function Order() {
   const [orderData, setOrderData] = useState<OrderData[]>([]);
   const [editedData, setEditedData] = useState<OrderData[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [activeCell, setActiveCell] = useState<{
     row: number;
     field: keyof OrderData;
@@ -49,6 +55,17 @@ export default function Order() {
     setEditedData(validData);
   };
 
+  const validateField = (field: keyof OrderData, value: string) => {
+    let errorMessage = "";
+    if (!value.trim()) {
+      errorMessage = `${field} is required.`;
+    } else if (field === "Order ID" && !/^\d+$/.test(value)) {
+      errorMessage = "Order ID must be numeric.";
+    }
+    // Add more field-specific validation logic here
+    return errorMessage;
+  };
+
   const handleCellEdit = (
     rowIndex: number,
     field: keyof OrderData,
@@ -56,6 +73,14 @@ export default function Order() {
   ) => {
     const newData = [...editedData];
     newData[rowIndex] = { ...newData[rowIndex], [field]: value };
+
+    // Validate the field and update the errors state
+    const error = validateField(field, value);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [`${rowIndex}-${field}`]: error,
+    }));
+
     setEditedData(newData);
   };
 
@@ -164,9 +189,9 @@ export default function Order() {
                     {orderRequiredFields.map((field) => (
                       <TableCell
                         key={field}
-                        // sx={{
-                        //   padding: "8px 16px",
-                        // }}
+                        style={{
+                          position: "relative",
+                        }}
                       >
                         <TextField
                           value={row[field]}
@@ -191,6 +216,23 @@ export default function Order() {
                           }
                           onBlur={() => setActiveCell(null)}
                         />
+
+                        <Box sx={{ position: "absolute", top: 10, right: 6 }}>
+                          {!errors[`${rowIndex}-${field}`] ? (
+                            <Check sx={{ color: "green", marginLeft: 1 }} />
+                          ) : (
+                            <Close sx={{ color: "red", marginLeft: 1 }} />
+                          )}
+                        </Box>
+                        {errors[`${rowIndex}-${field}`] && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ marginTop: "4px" }}
+                          >
+                            {errors[`${rowIndex}-${field}`]}
+                          </Typography>
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
