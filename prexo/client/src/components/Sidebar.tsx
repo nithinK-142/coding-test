@@ -5,7 +5,16 @@ import {
   SubMenu,
 } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 import {
   ShoppingCart,
   DeliveryDining,
@@ -14,176 +23,195 @@ import {
   Widgets,
   ExitToApp,
 } from "@mui/icons-material";
-import { useContext, useState } from "react";
+import { SetStateAction, useContext, useState } from "react";
 import { AuthContext } from "../context/auth-context";
 
 export default function Sidebar() {
   const { logout } = useContext(AuthContext);
-  const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
+  const [activeSubMenu, setActiveSubMenu] = useState<
+    string | SetStateAction<null>
+  >(null);
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
 
-  const handleSubMenuClick = (menu: string) => {
+  const handleSubMenuClick = (menu: string | SetStateAction<null>) => {
     setActiveSubMenu(menu);
   };
+
+  const handleLogoutClick = () => {
+    setOpenLogoutDialog(true);
+  };
+
+  const handleCloseLogoutDialog = () => {
+    setOpenLogoutDialog(false);
+  };
+
+  const handleConfirmLogout = () => {
+    handleCloseLogoutDialog();
+    logout();
+  };
+
   return (
-    <ProSidebar>
-      <Box sx={{ padding: 2, backgroundColor: "#152238" }}>
-        <Typography
-          variant="h6"
-          sx={{
-            color: "#ecf0f1",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <WebStories />
-          Prexo
-        </Typography>
-      </Box>
-      <Menu style={{ color: "#ecf0f1", backgroundColor: "#152238" }}>
-        <MenuItem
-          icon={<Widgets />}
-          component={<Link to="/" />}
-          style={{
-            backgroundColor:
-              activeSubMenu === "dashboard" ? "#161f28" : "#152238",
-          }}
-          onClick={() => handleSubMenuClick("dashboard")}
-        >
-          Dashboard
-        </MenuItem>
-
-        <div
-          style={{
-            paddingTop: "1rem",
-            paddingLeft: "1rem",
-            paddingRight: "0.5rem",
-          }}
-        >
-          Pages
-        </div>
-        <SubMenu
-          icon={<ShoppingCart />}
-          label="Orders"
-          style={{ backgroundColor: "transparent" }}
-        >
-          <MenuItem
-            component={<Link to="/order/bulk-import" />}
-            style={{
-              backgroundColor:
-                activeSubMenu === "order" ? "#161f28" : "#152238",
-            }}
-            onClick={() => handleSubMenuClick("order")}
-          >
-            <FiberManualRecord
-              style={{
-                fontSize: "8px",
-                marginRight: "4px",
-                marginLeft: "6px",
-              }}
-            />
-            <span style={{ fontSize: "16px" }}>Order</span>
-          </MenuItem>
-          <MenuItem
-            component={<Link to="/order/bad-orders" />}
-            style={{
-              backgroundColor:
-                activeSubMenu === "bad-orders" ? "#161f28" : "#152238",
-            }}
-            onClick={() => handleSubMenuClick("bad-orders")}
-          >
-            <FiberManualRecord
-              style={{
-                fontSize: "8px",
-                marginRight: "4px",
-                marginLeft: "6px",
-              }}
-            />
-            <span style={{ fontSize: "16px" }}>Bad Orders</span>
-          </MenuItem>
-        </SubMenu>
-
-        <SubMenu
-          icon={<DeliveryDining />}
-          label="Delivery"
-          style={{ backgroundColor: "transparent" }}
-        >
-          <MenuItem
-            component={<Link to="/delivery/bulk-import" />}
-            style={{
-              backgroundColor:
-                activeSubMenu === "delivery" ? "#161f28" : "#152238",
+    <>
+      <ProSidebar>
+        <Box sx={{ padding: 4, backgroundColor: "#152238" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#ecf0f1",
               display: "flex",
               alignItems: "center",
             }}
-            onClick={() => handleSubMenuClick("delivery")}
           >
-            <FiberManualRecord
-              style={{
-                fontSize: "8px",
-                marginRight: "4px",
-                marginLeft: "6px",
-              }}
-            />
-            <span style={{ fontSize: "16px" }}>Delivery</span>
-          </MenuItem>
-          <MenuItem
-            component={<Link to="/delivery/bad-delivery" />}
-            style={{
-              backgroundColor:
-                activeSubMenu === "bad-delivery" ? "#161f28" : "#152238",
-            }}
-            onClick={() => handleSubMenuClick("bad-delivery")}
-          >
-            <FiberManualRecord
-              style={{
-                fontSize: "8px",
-                marginRight: "4px",
-                marginLeft: "6px",
-              }}
-            />
-            <span style={{ fontSize: "16px" }}>Bad Delivery</span>
-          </MenuItem>
-        </SubMenu>
-
-        {/* Logout button */}
-        <MenuItem
-          icon={<ExitToApp />}
-          onClick={logout}
+            <WebStories />
+            Prexo
+          </Typography>
+        </Box>
+        <Menu
           style={{
-            backgroundColor: "transparent",
-            marginTop: "auto",
+            color: "#ecf0f1",
+            backgroundColor: "#152238",
+            fontSize: "12px",
           }}
         >
-          Logout
-        </MenuItem>
+          <MenuItem
+            icon={<Widgets />}
+            component={<Link to="/" />}
+            style={{
+              backgroundColor:
+                activeSubMenu === "dashboard" ? "#161f28" : "#152238",
+            }}
+            onClick={() => handleSubMenuClick("dashboard")}
+          >
+            Dashboard
+          </MenuItem>
 
-        {/* <SubMenu
-            icon={<Settings />}
-            label="Settings"
+          <div
+            style={{
+              paddingTop: "1rem",
+              paddingLeft: "1rem",
+              paddingRight: "0.5rem",
+            }}
+          >
+            Pages
+          </div>
+          <SubMenu
+            icon={<ShoppingCart />}
+            label="Orders"
             style={{ backgroundColor: "transparent" }}
           >
             <MenuItem
-              component={<Link to="/profile" />}
+              component={<Link to="/order/bulk-import" />}
               style={{
                 backgroundColor:
-                  activeSubMenu === "profile" ? "#161f28" : "#152238",
+                  activeSubMenu === "order" ? "#161f28" : "#152238",
               }}
-              onClick={() => handleSubMenuClick("profile")}
+              onClick={() => handleSubMenuClick("order")}
             >
-              Profile
+              <FiberManualRecord
+                style={{
+                  fontSize: "6px",
+                  marginRight: "8px",
+                  marginLeft: "6px",
+                }}
+              />
+              <span>Order</span>
             </MenuItem>
             <MenuItem
-              component={<Link to="/preferences" />}
+              component={<Link to="/order/bad-orders" />}
               style={{
                 backgroundColor:
-                  activeSubMenu === "preferences" ? "#161f28" : "#152238",
+                  activeSubMenu === "bad-orders" ? "#161f28" : "#152238",
               }}
-              onClick={() => handleSubMenuClick("preferences")}
+              onClick={() => handleSubMenuClick("bad-orders")}
             >
-              Preferences
+              <FiberManualRecord
+                style={{
+                  fontSize: "6px",
+                  marginRight: "8px",
+                  marginLeft: "6px",
+                }}
+              />
+              <span>Bad Orders</span>
             </MenuItem>
-          </SubMenu> */}
-      </Menu>
-    </ProSidebar>
+          </SubMenu>
+
+          <SubMenu
+            icon={<DeliveryDining />}
+            label="Delivery"
+            style={{ backgroundColor: "transparent" }}
+          >
+            <MenuItem
+              component={<Link to="/delivery/bulk-import" />}
+              style={{
+                backgroundColor:
+                  activeSubMenu === "delivery" ? "#161f28" : "#152238",
+                display: "flex",
+                alignItems: "center",
+              }}
+              onClick={() => handleSubMenuClick("delivery")}
+            >
+              <FiberManualRecord
+                style={{
+                  fontSize: "6px",
+                  marginRight: "8px",
+                  marginLeft: "6px",
+                }}
+              />
+              <span>Delivery</span>
+            </MenuItem>
+            <MenuItem
+              component={<Link to="/delivery/bad-delivery" />}
+              style={{
+                backgroundColor:
+                  activeSubMenu === "bad-delivery" ? "#161f28" : "#152238",
+              }}
+              onClick={() => handleSubMenuClick("bad-delivery")}
+            >
+              <FiberManualRecord
+                style={{
+                  fontSize: "6px",
+                  marginRight: "8px",
+                  marginLeft: "6px",
+                }}
+              />
+              <span>Bad Delivery</span>
+            </MenuItem>
+          </SubMenu>
+
+          {/* Logout button */}
+          <MenuItem
+            icon={<ExitToApp />}
+            onClick={handleLogoutClick}
+            style={{
+              backgroundColor: "transparent",
+              marginTop: "auto",
+            }}
+          >
+            Logout
+          </MenuItem>
+        </Menu>
+      </ProSidebar>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog
+        open={openLogoutDialog}
+        onClose={handleCloseLogoutDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Logout"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to logout?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseLogoutDialog}>Cancel</Button>
+          <Button onClick={handleConfirmLogout} autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

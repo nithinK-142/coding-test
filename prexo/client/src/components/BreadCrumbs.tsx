@@ -8,7 +8,7 @@ const BreadCrumbs = () => {
 
   if (pathnames.length === 0) {
     return (
-      <Link color="inherit" href="/" style={{ opacity: 0.7 }}>
+      <Link color="inherit" href="/" style={{ opacity: 0.7, color: "blue" }}>
         <Home />
       </Link>
     );
@@ -17,12 +17,13 @@ const BreadCrumbs = () => {
   return (
     <Breadcrumbs
       aria-label="breadcrumb"
+      separator=">"
       style={{ display: "flex", alignItems: "center" }}
     >
       <Typography color="text.primary">
         {pathnames[pathnames.length - 1]}
       </Typography>
-      <Link color="inherit" href="/">
+      <Link href="/" style={{ color: "blue", opacity: 0.7 }}>
         <Home />
       </Link>
       {pathnames.map((name, index) => {
