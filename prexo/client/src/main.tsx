@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import Order from "./pages/Order.tsx";
 import Delivery from "./pages/Delivery.tsx";
 import { NotFound } from "./pages/NotFound.tsx";
+import Bag from "./components/Bag.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -43,6 +44,7 @@ const router = createBrowserRouter(
         }
       />
       <Route path="login" element={<Login />} />
+      <Route path="bag" element={<Bag />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

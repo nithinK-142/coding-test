@@ -6,12 +6,18 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
+import { useContext } from "react";
+import { PathContext } from "../context/path-context";
 
 export default function Navbar() {
   function capitalizeText(text: string) {
     return text.toUpperCase();
   }
+  const { pathnames } = useContext(PathContext);
 
+  console.log(pathnames);
+
+  const isSuperAdmin = pathnames.includes("Bag");
   return (
     <Box>
       <AppBar
@@ -38,7 +44,9 @@ export default function Navbar() {
               opacity: 0.8,
             }}
           >
-            {capitalizeText("Processing MIS Panel")}
+            {capitalizeText(
+              isSuperAdmin ? "Super Admin Panel" : "Processing MIS Panel"
+            )}
           </Typography>
           {/* User avatar with name */}
           <Stack direction="row" spacing={1} alignItems="center">
@@ -47,7 +55,7 @@ export default function Navbar() {
               variant="body1"
               sx={{ fontWeight: "medium", letterSpacing: "-0.025em" }}
             >
-              John Doe
+              {isSuperAdmin ? "Sup Admin" : "John Doe"}
             </Typography>
             <Avatar sx={{ bgcolor: "#1976d2", height: 32, width: 32 }}>
               MIS

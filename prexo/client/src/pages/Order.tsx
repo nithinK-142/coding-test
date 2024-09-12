@@ -107,6 +107,7 @@ export default function Order() {
               backgroundColor: "#E49B0F",
               fontSize: "0.8rem",
               height: "auto",
+              color: "Black",
             }}
           >
             Back to list
