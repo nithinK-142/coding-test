@@ -23,8 +23,17 @@ export const PathContextProvider = (props: { children: React.ReactNode }) => {
     setPathName(pathname);
   }, [pathname]);
 
+  // Function to capitalize the first letter of each word and replace hyphens with spaces
+  const formatPathname = (str: string) => {
+    return str
+      .replace(/-/g, " ") // Replace hyphens with spaces
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+  };
   const pathnames = useMemo(() => {
-    return pathname.split("/").filter((x) => x);
+    return pathname
+      .split("/")
+      .filter((x) => x)
+      .map(formatPathname);
   }, [pathname]);
 
   const getRouteTo = (index: number) => {

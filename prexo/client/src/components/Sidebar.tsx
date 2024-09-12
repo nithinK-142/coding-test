@@ -108,7 +108,7 @@ export default function Sidebar() {
                 paddingTop: "0.4rem", // Reduced top padding
                 paddingBottom: "0.4rem", // Reduced bottom padding
                 "&:hover": {
-                  backgroundColor: "#1e2f4a",
+                  backgroundColor: "#383e55",
                 },
                 // borderRadius: "8px",
               },

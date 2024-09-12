@@ -6,7 +6,20 @@ import { Typography, Breadcrumbs, Link } from "@mui/material";
 const BreadCrumbs = () => {
   const { pathnames, getRouteTo } = useContext(PathContext);
 
-  if (pathnames.length === 0) {
+  // Modify the pathnames based on the condition
+  const modifiedPathnames = pathnames.map((name, index) => {
+    if (name === "Bulk Import") {
+      const previous = pathnames[index - 1];
+      if (previous === "Order") {
+        return "Bulk Order";
+      } else if (previous === "Delivery") {
+        return "Bulk Delivery";
+      }
+    }
+    return name;
+  });
+
+  if (modifiedPathnames.length === 0) {
     return (
       <Link color="inherit" href="/" style={{ opacity: 0.7, color: "blue" }}>
         <Home />
@@ -20,14 +33,14 @@ const BreadCrumbs = () => {
       separator=">"
       style={{ display: "flex", alignItems: "center" }}
     >
-      <Typography color="text.primary">
-        {pathnames[pathnames.length - 1]}
+      <Typography color="text.primary" sx={{ fontWeight: "600", opacity: 0.8 }}>
+        {modifiedPathnames[modifiedPathnames.length - 1]}
       </Typography>
-      <Link href="/" style={{ color: "blue", opacity: 0.7 }}>
+      <Link href="/" style={{ color: "#20a7db" }}>
         <Home />
       </Link>
-      {pathnames.map((name, index) => {
-        const isLast = index === pathnames.length - 1;
+      {modifiedPathnames.map((name, index) => {
+        const isLast = index === modifiedPathnames.length - 1;
         return isLast ? (
           <Typography key={name} color="inherit">
             {name}

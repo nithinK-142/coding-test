@@ -130,7 +130,7 @@ export default function Order() {
         <Box sx={{ mx: "auto", borderRadius: "4px" }}>
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 600, maxWidth: "1250", overflow: "auto" }}
+            sx={{ maxHeight: 600, maxWidth: 1250, overflow: "auto" }}
           >
             <Table
               stickyHeader
