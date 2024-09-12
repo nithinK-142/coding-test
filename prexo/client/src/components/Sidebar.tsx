@@ -27,7 +27,6 @@ import {
   Class,
   PlayCircleOutline,
   TransferWithinAStation,
-  NoteRounded,
   SortRounded,
   AddShoppingCartRounded,
   FormatAlignRightRounded,
@@ -35,6 +34,7 @@ import {
   Report,
   TrackChanges,
   ArtTrack,
+  Assignment,
 } from "@mui/icons-material";
 import { AuthContext } from "../context/auth-context";
 
@@ -80,7 +80,10 @@ export default function Sidebar() {
           },
         }}
       >
-        <ProSidebar width="240px" style={{ paddingInline: "1rem" }}>
+        <ProSidebar
+          width="240px"
+          style={{ paddingInline: "1rem", borderRight: "1px solid #222942" }}
+        >
           <Box sx={{ padding: 2, backgroundColor: "#222942" }}>
             <Typography
               variant="h6"
@@ -214,7 +217,7 @@ export default function Sidebar() {
               label="Bag Transfer"
             ></SubMenu>
             <SubMenu
-              icon={<NoteRounded style={{ fontSize: "18px" }} />}
+              icon={<Assignment style={{ fontSize: "18px" }} />}
               label="Assign to Agent"
             ></SubMenu>
             <SubMenu
