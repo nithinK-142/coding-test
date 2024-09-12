@@ -13,25 +13,7 @@ function AuthenticatedApp() {
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
       {/* Sidebar */}
-      {isAuthenticated && (
-        <Box
-          sx={{
-            width: 250,
-            height: "100%",
-            backgroundColor: "#152238",
-            color: "#ecf0f1",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            overflowY: "auto",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Sidebar />
-        </Box>
-      )}
+      {isAuthenticated && <Sidebar />}
       <Box
         sx={{
           flex: 1,
