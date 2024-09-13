@@ -41,7 +41,6 @@ const Bag = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newBag, setNewBag] = useState({
-    bagId: "",
     cpc: "",
     bagDisplayName: "",
     warehouse: "",
@@ -49,7 +48,6 @@ const Bag = () => {
     bagCategory: "",
     bagDisplay: "",
   });
-  const [nextBagId, setNextBagId] = useState(2000);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handleOpenDialog = () => {
@@ -60,18 +58,6 @@ const Bag = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setFormErrors({});
-  };
-
-  useEffect(() => {
-    setNextBagId(getBagId());
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("nextBagId", nextBagId.toString());
-  }, [nextBagId]);
-
-  const getBagId = () => {
-    return parseInt(localStorage.getItem("nextBagId") || "2000");
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,12 +154,10 @@ const Bag = () => {
         `${import.meta.env.VITE_API_URL}/bag/saveBag`,
         newBagData
       );
-      localStorage.setItem("nextBagId", String(nextBagId + 1));
       if (response.status === 201) {
         getBags();
         handleCloseDialog();
         setNewBag({
-          bagId: "",
           cpc: "",
           bagDisplayName: "",
           warehouse: "",
@@ -258,20 +242,32 @@ const Bag = () => {
       <Typography sx={{ mt: 2 }}>All Bags</Typography>
 
       <Box sx={{ mx: "auto", borderRadius: "4px" }}>
-        <TableContainer
-          component={Paper}
-          sx={{ maxHeight: 600, maxWidth: 1300, overflow: "auto" }}
-        >
-          <Table stickyHeader aria-label="delivery data table">
+        <TableContainer component={Paper}>
+          <Table
+            stickyHeader
+            aria-label="delivery data table"
+            sx={{ minWidth: 1600 }}
+            size="small"
+          >
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: "bold", minWidth: 50 }}>
+                <TableCell
+                  sx={{
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    backgroundColor: "gray",
+                  }}
+                >
                   Sl No
                 </TableCell>
                 {bagRequiredFields.map((field) => (
                   <TableCell
                     key={field}
-                    sx={{ fontWeight: "bold", minWidth: 100 }}
+                    sx={{
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      backgroundColor: "gray",
+                    }}
                   >
                     {field}
                   </TableCell>
@@ -280,13 +276,10 @@ const Bag = () => {
             </TableHead>
             <TableBody>
               {bags.map((row, index) => (
-                <TableRow
-                  key={index}
-                  sx={{ padding: "8px 16px", minWidth: 100 }}
-                >
+                <TableRow key={index}>
                   <TableCell>{index + 1}</TableCell>
                   {bagRequiredFields.map((field) => (
-                    <TableCell key={field} sx={{ padding: "8px 16px" }}>
+                    <TableCell key={field}>
                       {field === "Actions" ? (
                         <Box sx={{ display: "flex", gap: 1 }}>
                           <Create
@@ -305,16 +298,16 @@ const Bag = () => {
                           />
                         </Box>
                       ) : (
-                        <TextField
-                          value={row[field]}
-                          variant="standard"
-                          fullWidth
-                          InputProps={{
-                            disableUnderline: true,
-                            style: { fontSize: "0.875rem" },
-                            readOnly: field === "Bag ID",
+                        <Typography
+                          style={{
+                            fontSize: "0.875rem",
+                            // border: "1px solid black",
+                            padding: 0,
+                            textAlign: "center",
                           }}
-                        />
+                        >
+                          {row[field]}
+                        </Typography>
                       )}
                     </TableCell>
                   ))}
