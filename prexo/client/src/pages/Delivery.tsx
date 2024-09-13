@@ -61,6 +61,16 @@ export default function Delivery() {
   const validateField = (field: keyof DeliveryData, value: string) => {
     let errorMessage = "";
 
+    if (
+      [
+        "Diagnostics Discount",
+        "Storage Discount",
+        "Doorstep Diagnostics",
+      ].includes(field)
+    ) {
+      return errorMessage;
+    }
+
     if (!value.trim()) {
       errorMessage = `${field} is required.`;
     } else if (field === "Order ID" && !/^[0-9-]+$/.test(value)) {
@@ -107,14 +117,16 @@ export default function Delivery() {
     field: keyof DeliveryData,
     value: string
   ) => {
-    const newData = [...editedData];
-    newData[rowIndex] = { ...newData[rowIndex], [field]: value };
-    setEditedData(newData);
+    setEditedData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex] = { ...newData[rowIndex], [field]: value };
+      return newData;
+    });
 
     if (isValidated) {
       const error = validateField(field, value);
-      setErrors((prev) => ({
-        ...prev,
+      setErrors((prevErrors) => ({
+        ...prevErrors,
         [`${rowIndex}-${field}`]: error,
       }));
     }
@@ -301,33 +313,46 @@ export default function Delivery() {
                             }
                             onBlur={() => setActiveCell(null)}
                           />
-                          {isValidated && (
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                top: "20%",
-                                right: -10,
-                                transform: "translateY(-50%)",
-                              }}
-                            >
-                              {!errors[`${rowIndex}-${field}`] ? (
-                                <Check sx={{ color: "green", marginLeft: 1 }} />
-                              ) : (
-                                <Close sx={{ color: "red", marginLeft: 1 }} />
-                              )}
-                            </Box>
-                          )}
+                          {![
+                            "Diagnostics Discount",
+                            "Storage Discount",
+                            "Doorstep Diagnostics",
+                          ].includes(field) &&
+                            isValidated && (
+                              <Box
+                                sx={{
+                                  position: "absolute",
+                                  top: "20%",
+                                  right: -10,
+                                  transform: "translateY(-50%)",
+                                }}
+                              >
+                                {!errors[`${rowIndex}-${field}`] ? (
+                                  <Check
+                                    sx={{ color: "green", marginLeft: 1 }}
+                                  />
+                                ) : (
+                                  <Close sx={{ color: "red", marginLeft: 1 }} />
+                                )}
+                              </Box>
+                            )}
                         </Box>
 
-                        {isValidated && errors[`${rowIndex}-${field}`] && (
-                          <Typography
-                            variant="caption"
-                            color="error"
-                            sx={{ marginTop: "4px" }}
-                          >
-                            {errors[`${rowIndex}-${field}`]}
-                          </Typography>
-                        )}
+                        {![
+                          "Diagnostics Discount",
+                          "Storage Discount",
+                          "Doorstep Diagnostics",
+                        ].includes(field) &&
+                          isValidated &&
+                          errors[`${rowIndex}-${field}`] && (
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              sx={{ marginTop: "4px" }}
+                            >
+                              {errors[`${rowIndex}-${field}`]}
+                            </Typography>
+                          )}
                       </TableCell>
                     ))}
                   </TableRow>

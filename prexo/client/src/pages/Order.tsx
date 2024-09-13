@@ -103,14 +103,16 @@ export default function Order() {
     field: keyof OrderData,
     value: string
   ) => {
-    const newData = [...editedData];
-    newData[rowIndex] = { ...newData[rowIndex], [field]: value };
-    setEditedData(newData);
+    setEditedData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex] = { ...newData[rowIndex], [field]: value };
+      return newData;
+    });
 
     if (isValidated) {
       const error = validateField(field, value);
-      setErrors((prev) => ({
-        ...prev,
+      setErrors((prevErrors) => ({
+        ...prevErrors,
         [`${rowIndex}-${field}`]: error,
       }));
     }
