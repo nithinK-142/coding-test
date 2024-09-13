@@ -35,6 +35,7 @@ import {
   TrackChanges,
   ArtTrack,
   Assignment,
+  Save,
 } from "@mui/icons-material";
 import { AuthContext } from "../context/auth-context";
 
@@ -260,14 +261,12 @@ export default function Sidebar() {
               </>
             ) : (
               <MenuItem
+                icon={<Save style={{ fontSize: "18px" }} />}
                 component={<Link to="/bag" />}
                 active={activeSubMenu === "delivery"}
                 onClick={() => handleSubMenuClick("delivery")}
-                style={{
-                  paddingLeft: "1.2rem",
-                }}
               >
-                Bags
+                Bagging
               </MenuItem>
             )}
             <MenuItem

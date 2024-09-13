@@ -44,7 +44,14 @@ const router = createBrowserRouter(
         }
       />
       <Route path="login" element={<Login />} />
-      <Route path="bag" element={<Bag />} />
+      <Route
+        path="bag"
+        element={
+          <ProtectedRoute>
+            <Bag />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

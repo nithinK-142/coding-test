@@ -28,15 +28,20 @@ export const AuthContextProvider = (props: { children: React.ReactNode }) => {
 
   const login = useCallback(
     async (credentials: { f_UserName: string; f_Pwd: string }) => {
-      const { data } = await axios.post(
-        import.meta.env.VITE_API_URL + "/login",
-        credentials
-      );
-      console.log(data);
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.user.username);
-      setIsAuthenticated(true);
-      navigate("/");
+      try {
+        const { data } = await axios.post(
+          import.meta.env.VITE_API_URL + "/login",
+          credentials
+        );
+        console.log(data);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.user.username);
+        setIsAuthenticated(true);
+        navigate("/");
+      } catch (error) {
+        alert("User not found or wrong credentials!!");
+        console.log(error);
+      }
     },
     []
   );

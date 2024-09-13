@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -18,6 +19,7 @@ import {
   MenuItem,
   Grid,
 } from "@mui/material";
+import { Create, Delete, Replay } from "@mui/icons-material";
 
 const Bag = () => {
   const bagRequiredFields = [
@@ -35,8 +37,9 @@ const Bag = () => {
 
   type BagData = Record<(typeof bagRequiredFields)[number], string>;
 
-  const [editedData, setEditedData] = useState<BagData[]>([]);
+  const [bags, setBags] = useState<BagData[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [newBag, setNewBag] = useState({
     bagId: "",
     cpc: "",
@@ -46,54 +49,143 @@ const Bag = () => {
     bagCategory: "",
     bagDisplay: "",
   });
+  const [nextBagId, setNextBagId] = useState(2000);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
-  const handleOpenDialog = () => setDialogOpen(true);
+  const handleOpenDialog = () => {
+    const bagDisplayName = `PREXO / GGN / BOT Bag #${nextBagId}`;
+    setNewBag((prev) => ({
+      ...prev,
+      bagId: `DDB-BLR-${nextBagId}`,
+      bagDisplayName,
+      bagDisplay: bagDisplayName,
+    }));
+    setDialogOpen(true);
+  };
   const handleCloseDialog = () => setDialogOpen(false);
+
+  useEffect(() => {
+    setNextBagId(getBagId());
+  }, []);
+
+  const getBagId = () => {
+    return parseInt(localStorage.getItem("nextBagId") || "2000");
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    if (name === "bagLimit") {
+      const numValue = parseInt(value);
+      if (isNaN(numValue) || numValue > 40) return;
+    }
     setNewBag((prev) => ({ ...prev, [name]: value }));
 
-    // Reset warehouse when CPC changes
     if (name === "cpc") {
       setNewBag((prev) => ({ ...prev, warehouse: "" }));
     }
   };
 
-  const handleSaveBag = () => {
-    const newBagData: BagData = {
-      "Bag ID": newBag.bagId,
-      Location: newBag.cpc,
-      Warehouse: newBag.warehouse,
-      "Bag Display Name": newBag.bagDisplayName,
-      "Bag Limit": newBag.bagLimit,
-      "Bag Display": newBag.bagDisplay,
-      "Bag Type": newBag.bagCategory,
-      Status: "Active",
-      "Creation Date": new Date().toISOString().split("T")[0],
-      Actions: "",
-    };
-
-    setEditedData((prev) => [...prev, newBagData]);
-    handleCloseDialog();
-    setNewBag({
-      bagId: "",
-      cpc: "",
-      bagDisplayName: "",
-      warehouse: "",
-      bagLimit: "",
-      bagCategory: "",
-      bagDisplay: "",
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    Object.entries(newBag).forEach(([key, value]) => {
+      if (!value) {
+        errors[key] = "This field is required";
+      }
     });
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  // Sample data for dropdowns
-  const cpcOptions = ["Bangalore", "Gurugram"];
+  const cpcOptions = ["Bangalore_560067", "Gurugram_122016"];
   const warehouseOptions = {
-    Bangalore: ["Bangalore Warehouse A", "Bangalore Warehouse B"],
-    Gurugram: ["Gurugram Warehouse X", "Gurugram Warehouse Y"],
+    Bangalore_560067: ["Bangalore Warehouse A", "Bangalore Warehouse B"],
+    Gurugram_122016: ["Gurugram Warehouse X", "Gurugram Warehouse Y"],
   };
   const bagCategoryOptions = ["BOT"];
+
+  const handleSaveBag = async () => {
+    if (!validateForm()) {
+      return;
+    }
+    const newBagData = {
+      ...newBag,
+      status: "No Status",
+      creationDate: new Date().toISOString(),
+    };
+
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/bag/saveBag`,
+        newBagData
+      );
+      localStorage.setItem("nextBagId", String(nextBagId + 1));
+      if (response.status === 201) {
+        getBags();
+        handleCloseDialog();
+        setNewBag({
+          bagId: "",
+          cpc: "",
+          bagDisplayName: "",
+          warehouse: "",
+          bagLimit: "",
+          bagCategory: "",
+          bagDisplay: "",
+        });
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Error saving bag:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getBags = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/bag/getBags`
+      );
+      if (response.status === 200) {
+        console.log(response.data);
+        setBags(response.data.map((item: any) => formatResponse(item)));
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching bags:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatResponse = (data: any) => {
+    // Convert the ISO string to a Date object
+    const dateObj = new Date(data.creationDate);
+
+    // Format the date to a readable local format
+    const localDate = dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    return {
+      "Bag ID": data.bagId,
+      Location: data.cpc, // Assuming cpc represents location
+      Warehouse: data.warehouse,
+      "Bag Display Name": data.bagDisplayName,
+      "Bag Limit": data.bagLimit,
+      "Bag Display": data.bagDisplay,
+      "Bag Type": data.bagCategory, // Assuming bagCategory represents bag type
+      Status: data.status,
+      "Creation Date": localDate,
+      Actions: "", // Assuming no data provided for "Actions"
+    };
+  };
+
+  useEffect(() => {
+    getBags();
+  }, []);
 
   return (
     <div>
@@ -121,6 +213,9 @@ const Bag = () => {
       <Typography sx={{ mt: 2 }}>All Bags</Typography>
 
       <Box sx={{ mx: "auto", borderRadius: "4px" }}>
+        {/* {loading && <Typography>Loading...</Typography>} */}
+        {/* {bags.length > 0 && ( */}
+
         <TableContainer
           component={Paper}
           sx={{ maxHeight: 600, maxWidth: 1300, overflow: "auto" }}
@@ -142,20 +237,44 @@ const Bag = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {editedData.map((row, index) => (
-                <TableRow key={index}>
+              {bags.map((row, index) => (
+                <TableRow
+                  key={index}
+                  sx={{ padding: "8px 16px", minWidth: 100 }}
+                >
                   <TableCell>{index + 1}</TableCell>
                   {bagRequiredFields.map((field) => (
                     <TableCell key={field} sx={{ padding: "8px 16px" }}>
-                      <TextField
-                        value={row[field]}
-                        variant="standard"
-                        fullWidth
-                        InputProps={{
-                          disableUnderline: true,
-                          style: { fontSize: "0.875rem" },
-                        }}
-                      />
+                      {field === "Actions" ? (
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          <Create
+                            sx={{
+                              color: "blue",
+                              cursor: "pointer",
+                              opacity: "0.7",
+                            }}
+                          />
+                          <Delete
+                            sx={{
+                              color: "red",
+                              cursor: "pointer",
+                              opacity: "0.7",
+                            }}
+                          />
+                          <Replay sx={{ cursor: "pointer", opacity: "0.7" }} />
+                        </Box>
+                      ) : (
+                        <TextField
+                          value={row[field]}
+                          variant="standard"
+                          fullWidth
+                          InputProps={{
+                            disableUnderline: true,
+                            style: { fontSize: "0.875rem" },
+                            readOnly: field === "Bag ID",
+                          }}
+                        />
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -163,6 +282,7 @@ const Bag = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        {/* )} */}
       </Box>
 
       <Dialog

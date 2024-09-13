@@ -3,7 +3,6 @@ import { DashboardItem } from "../constants";
 import { Typography } from "@mui/material";
 
 const Card = (dashboardItem: { dashboardItem: DashboardItem }) => {
-  console.log(dashboardItem.dashboardItem.icon);
   return (
     <Grid
       style={{
