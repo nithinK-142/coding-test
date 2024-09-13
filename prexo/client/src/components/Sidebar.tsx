@@ -39,7 +39,7 @@ import {
 import { AuthContext } from "../context/auth-context";
 
 export default function Sidebar() {
-  const { logout } = useContext(AuthContext);
+  const { logout, username } = useContext(AuthContext);
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
 
@@ -144,116 +144,132 @@ export default function Sidebar() {
             >
               <span style={{ opacity: 0.7 }}>PAGES</span>
             </Typography>
+            {username === "mis" ? (
+              <>
+                <SubMenu
+                  icon={<Reorder style={{ fontSize: "18px" }} />}
+                  label="Orders"
+                >
+                  <MenuItem
+                    component={<Link to="/order/bulk-import" />}
+                    active={activeSubMenu === "order"}
+                    onClick={() => handleSubMenuClick("order")}
+                    style={{
+                      paddingLeft: "1.2rem",
+                    }}
+                  >
+                    <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
+                    <span>Order</span>
+                  </MenuItem>
+                  <MenuItem
+                    component={<Link to="/order/bad-orders" />}
+                    active={activeSubMenu === "bad-orders"}
+                    onClick={() => handleSubMenuClick("bad-orders")}
+                    style={{
+                      paddingLeft: "1.2rem",
+                    }}
+                  >
+                    <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
+                    <span>Bad Orders</span>
+                  </MenuItem>
+                </SubMenu>
 
-            <SubMenu
-              icon={<Reorder style={{ fontSize: "18px" }} />}
-              label="Orders"
-            >
-              <MenuItem
-                component={<Link to="/order/bulk-import" />}
-                active={activeSubMenu === "order"}
-                onClick={() => handleSubMenuClick("order")}
-                style={{
-                  paddingLeft: "1.2rem",
-                }}
-              >
-                <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
-                <span>Order</span>
-              </MenuItem>
-              <MenuItem
-                component={<Link to="/order/bad-orders" />}
-                active={activeSubMenu === "bad-orders"}
-                onClick={() => handleSubMenuClick("bad-orders")}
-                style={{
-                  paddingLeft: "1.2rem",
-                }}
-              >
-                <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
-                <span>Bad Orders</span>
-              </MenuItem>
-            </SubMenu>
+                <SubMenu
+                  icon={<DeliveryDining style={{ fontSize: "18px" }} />}
+                  label="Delivery"
+                >
+                  <MenuItem
+                    component={<Link to="/delivery/bulk-import" />}
+                    active={activeSubMenu === "delivery"}
+                    onClick={() => handleSubMenuClick("delivery")}
+                    style={{
+                      paddingLeft: "1.2rem",
+                    }}
+                  >
+                    <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
+                    <span>Delivery</span>
+                  </MenuItem>
+                  <MenuItem
+                    component={<Link to="/delivery/bad-delivery" />}
+                    active={activeSubMenu === "bad-delivery"}
+                    onClick={() => handleSubMenuClick("bad-delivery")}
+                    style={{
+                      paddingLeft: "1.2rem",
+                    }}
+                  >
+                    <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
+                    <span>Bad Delivery</span>
+                  </MenuItem>
+                </SubMenu>
 
-            <SubMenu
-              icon={<DeliveryDining style={{ fontSize: "18px" }} />}
-              label="Delivery"
-            >
+                <MenuItem icon={<Class style={{ fontSize: "18px" }} />}>
+                  WHT Trays
+                </MenuItem>
+                <SubMenu
+                  icon={<PlayCircleOutline style={{ fontSize: "18px" }} />}
+                  label="Recon Sheet"
+                ></SubMenu>
+                <SubMenu
+                  icon={
+                    <FormatAlignRightRounded style={{ fontSize: "18px" }} />
+                  }
+                  label="UIC Manage"
+                ></SubMenu>
+                <SubMenu
+                  icon={<TransferWithinAStation style={{ fontSize: "18px" }} />}
+                  label="Bag Transfer"
+                ></SubMenu>
+                <SubMenu
+                  icon={<Assignment style={{ fontSize: "18px" }} />}
+                  label="Assign to Agent"
+                ></SubMenu>
+                <SubMenu
+                  icon={<SortRounded style={{ fontSize: "18px" }} />}
+                  label="Sorting"
+                ></SubMenu>
+                <SubMenu
+                  icon={<SortRounded style={{ fontSize: "18px" }} />}
+                  label="WHT to RP"
+                ></SubMenu>
+                <MenuItem
+                  icon={<AddShoppingCartRounded style={{ fontSize: "18px" }} />}
+                >
+                  Pickup
+                </MenuItem>
+                <SubMenu
+                  icon={<CallMerge style={{ fontSize: "18px" }} />}
+                  label="Merge"
+                ></SubMenu>
+                <SubMenu
+                  icon={<ShoppingCart style={{ fontSize: "18px" }} />}
+                  label="Tray Transfer"
+                ></SubMenu>
+
+                <SubMenu
+                  icon={<TrackChanges style={{ fontSize: "18px" }} />}
+                  label="Rack Change"
+                ></SubMenu>
+                <SubMenu
+                  icon={<ArtTrack style={{ fontSize: "18px" }} />}
+                  label="Track"
+                ></SubMenu>
+                <SubMenu
+                  icon={<Report style={{ fontSize: "18px" }} />}
+                  label="Report"
+                ></SubMenu>
+              </>
+            ) : (
               <MenuItem
-                component={<Link to="/delivery/bulk-import" />}
+                component={<Link to="/bag" />}
                 active={activeSubMenu === "delivery"}
                 onClick={() => handleSubMenuClick("delivery")}
                 style={{
                   paddingLeft: "1.2rem",
                 }}
               >
-                <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
-                <span>Delivery</span>
+                Bags
               </MenuItem>
-              <MenuItem
-                component={<Link to="/delivery/bad-delivery" />}
-                active={activeSubMenu === "bad-delivery"}
-                onClick={() => handleSubMenuClick("bad-delivery")}
-                style={{
-                  paddingLeft: "1.2rem",
-                }}
-              >
-                <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
-                <span>Bad Delivery</span>
-              </MenuItem>
-            </SubMenu>
-
-            <MenuItem icon={<Class style={{ fontSize: "18px" }} />}>
-              WHT Trays
-            </MenuItem>
-            <SubMenu
-              icon={<PlayCircleOutline style={{ fontSize: "18px" }} />}
-              label="Recon Sheet"
-            ></SubMenu>
-            <SubMenu
-              icon={<FormatAlignRightRounded style={{ fontSize: "18px" }} />}
-              label="UIC Manage"
-            ></SubMenu>
-            <SubMenu
-              icon={<TransferWithinAStation style={{ fontSize: "18px" }} />}
-              label="Bag Transfer"
-            ></SubMenu>
-            <SubMenu
-              icon={<Assignment style={{ fontSize: "18px" }} />}
-              label="Assign to Agent"
-            ></SubMenu>
-            <SubMenu
-              icon={<SortRounded style={{ fontSize: "18px" }} />}
-              label="Sorting"
-            ></SubMenu>
-            <SubMenu
-              icon={<SortRounded style={{ fontSize: "18px" }} />}
-              label="WHT to RP"
-            ></SubMenu>
-            <MenuItem
-              icon={<AddShoppingCartRounded style={{ fontSize: "18px" }} />}
-            >
-              Pickup
-            </MenuItem>
-            <SubMenu
-              icon={<CallMerge style={{ fontSize: "18px" }} />}
-              label="Merge"
-            ></SubMenu>
-            <SubMenu
-              icon={<ShoppingCart style={{ fontSize: "18px" }} />}
-              label="Tray Transfer"
-            ></SubMenu>
-
-            <SubMenu
-              icon={<TrackChanges style={{ fontSize: "18px" }} />}
-              label="Rack Change"
-            ></SubMenu>
-            <SubMenu
-              icon={<ArtTrack style={{ fontSize: "18px" }} />}
-              label="Track"
-            ></SubMenu>
-            <SubMenu
-              icon={<Report style={{ fontSize: "18px" }} />}
-              label="Report"
-            ></SubMenu>
+            )}
             <MenuItem
               icon={<ExitToApp style={{ fontSize: "18px" }} />}
               onClick={handleLogoutClick}

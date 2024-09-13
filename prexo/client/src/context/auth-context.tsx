@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 
 export interface IAuthContext {
   isAuthenticated: boolean;
+  username: string;
   login: (credentials: { f_UserName: string; f_Pwd: string }) => void;
   logout: () => void;
 }
 
 const defaultVal: IAuthContext = {
   isAuthenticated: false,
+  username: "",
   login: () => {},
   logout: () => {},
 };
@@ -21,6 +23,7 @@ export const AuthContextProvider = (props: { children: React.ReactNode }) => {
     localStorage.getItem("token") !== null &&
       localStorage.getItem("username") !== null
   );
+  const username = localStorage.getItem("username") || "";
   const navigate = useNavigate();
 
   const login = useCallback(
@@ -47,6 +50,7 @@ export const AuthContextProvider = (props: { children: React.ReactNode }) => {
 
   const contextValue: IAuthContext = {
     isAuthenticated,
+    username,
     login,
     logout,
   };
