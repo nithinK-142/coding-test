@@ -14,7 +14,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import Order from "./pages/Order.tsx";
 import Delivery from "./pages/Delivery.tsx";
 import { NotFound } from "./pages/NotFound.tsx";
-import Bag from "./components/Bag.tsx";
+import Bag from "./pages/Bag.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

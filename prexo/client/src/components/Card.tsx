@@ -1,10 +1,13 @@
-import { Box, Grid } from "@mui/system";
+import { Box } from "@mui/system";
 import { DashboardItem } from "../constants";
 import { Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Card = (dashboardItem: { dashboardItem: DashboardItem }) => {
   return (
-    <Grid
+    <Box
+      component={Link}
+      to={dashboardItem.dashboardItem.path}
       style={{
         color: "black",
         fontSize: "30px",
@@ -15,6 +18,8 @@ const Card = (dashboardItem: { dashboardItem: DashboardItem }) => {
 
         display: "flex",
         padding: "1rem",
+        cursor: "pointer",
+        textDecoration: "none",
       }}
     >
       <Box sx={{ marginRight: "1rem", opacity: 0.4, fontSize: "10px" }}>
@@ -33,7 +38,7 @@ const Card = (dashboardItem: { dashboardItem: DashboardItem }) => {
           {dashboardItem.dashboardItem.title}
         </Typography>
       </Box>
-    </Grid>
+    </Box>
   );
 };
 

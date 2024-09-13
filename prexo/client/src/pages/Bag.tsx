@@ -19,7 +19,7 @@ import {
   MenuItem,
   Grid,
 } from "@mui/material";
-import { Create, Delete, Replay } from "@mui/icons-material";
+import { Create, Delete } from "@mui/icons-material";
 
 const Bag = () => {
   const bagRequiredFields = [
@@ -53,20 +53,22 @@ const Bag = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handleOpenDialog = () => {
-    const bagDisplayName = `PREXO / GGN / BOT Bag #${nextBagId}`;
-    setNewBag((prev) => ({
-      ...prev,
-      bagId: `DDB-BLR-${nextBagId}`,
-      bagDisplayName,
-      bagDisplay: bagDisplayName,
-    }));
+    setNewBag((prev) => ({ ...prev }));
     setDialogOpen(true);
   };
-  const handleCloseDialog = () => setDialogOpen(false);
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setFormErrors({});
+  };
 
   useEffect(() => {
     setNextBagId(getBagId());
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("nextBagId", nextBagId.toString());
+  }, [nextBagId]);
 
   const getBagId = () => {
     return parseInt(localStorage.getItem("nextBagId") || "2000");
@@ -75,14 +77,27 @@ const Bag = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     if (name === "bagLimit") {
-      const numValue = parseInt(value);
-      if (isNaN(numValue) || numValue > 40) return;
+      // Convert value to a number only if it's not an empty string
+      const numValue = value === "" ? "" : Number(value);
+
+      // Ensure numValue is a number before comparison
+      if (
+        value === "" ||
+        (typeof numValue === "number" &&
+          numValue >= 0 &&
+          numValue <= 40 &&
+          !isNaN(numValue))
+      ) {
+        setNewBag((prev) => ({ ...prev, [name]: value }));
+      }
     }
     setNewBag((prev) => ({ ...prev, [name]: value }));
 
     if (name === "cpc") {
       setNewBag((prev) => ({ ...prev, warehouse: "" }));
     }
+
+    setFormErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const validateForm = () => {
@@ -96,11 +111,45 @@ const Bag = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const cpcOptions = ["Bangalore_560067", "Gurugram_122016"];
+  const cpcOptions = [
+    "Bangalore_560067",
+    "Gurugram_122016",
+    "Delhi_110001",
+    "Sales_Gurugaon_122016",
+    "gurgaon_122016",
+  ];
+
   const warehouseOptions = {
-    Bangalore_560067: ["Bangalore Warehouse A", "Bangalore Warehouse B"],
-    Gurugram_122016: ["Gurugram Warehouse X", "Gurugram Warehouse Y"],
+    Bangalore_560067: [
+      "Dock WH: Dealsdray / PREXO Bangalore",
+      "Processing WH: Dealsdray / PREXO Bangalore",
+      "639 - Spare Parts Warehouse",
+      "bagging_bangalore@gmail.com",
+    ],
+    Gurugram_122016: [
+      "Dock WH: Dealsdray / PREXO Grugaon",
+      "Processing WH: Dealsdray / PREXO Grugaon",
+      "634 - Spare Parts Warehouse",
+      "Pre - Processing Warehouse - 633",
+      "bagging@gmail.com",
+    ],
+    Delhi_110001: [
+      "Dock WH: Dealsdray / PREXO Delhi",
+      "Processing WH: Dealsdray / PREXO Delhi",
+      "642 - Spare Parts Warehouse",
+      "Pre - Processing Warehouse - 643",
+    ],
+    Sales_Gurugaon_122016: [
+      "Sales Dock WH: Dealsdray / PREXO Gurugaon",
+      "Sales Processing WH: Dealsdray / PREXO Gurugaon",
+      "sales_bagging@gmail.com",
+    ],
+    gurgaon_122016: [
+      "650 - Spare Parts Warehouse",
+      "Pre - Processing Warehouse - 651",
+    ],
   };
+
   const bagCategoryOptions = ["BOT"];
 
   const handleSaveBag = async () => {
@@ -148,7 +197,6 @@ const Bag = () => {
         `${import.meta.env.VITE_API_URL}/bag/getBags`
       );
       if (response.status === 200) {
-        console.log(response.data);
         setBags(response.data.map((item: any) => formatResponse(item)));
       }
     } catch (error) {
@@ -160,10 +208,7 @@ const Bag = () => {
   };
 
   const formatResponse = (data: any) => {
-    // Convert the ISO string to a Date object
     const dateObj = new Date(data.creationDate);
-
-    // Format the date to a readable local format
     const localDate = dateObj.toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
@@ -171,15 +216,15 @@ const Bag = () => {
     });
     return {
       "Bag ID": data.bagId,
-      Location: data.cpc, // Assuming cpc represents location
+      Location: data.cpc,
       Warehouse: data.warehouse,
       "Bag Display Name": data.bagDisplayName,
       "Bag Limit": data.bagLimit,
       "Bag Display": data.bagDisplay,
-      "Bag Type": data.bagCategory, // Assuming bagCategory represents bag type
+      "Bag Type": data.bagCategory,
       Status: data.status,
       "Creation Date": localDate,
-      Actions: "", // Assuming no data provided for "Actions"
+      Actions: "",
     };
   };
 
@@ -213,9 +258,6 @@ const Bag = () => {
       <Typography sx={{ mt: 2 }}>All Bags</Typography>
 
       <Box sx={{ mx: "auto", borderRadius: "4px" }}>
-        {/* {loading && <Typography>Loading...</Typography>} */}
-        {/* {bags.length > 0 && ( */}
-
         <TableContainer
           component={Paper}
           sx={{ maxHeight: 600, maxWidth: 1300, overflow: "auto" }}
@@ -261,7 +303,6 @@ const Bag = () => {
                               opacity: "0.7",
                             }}
                           />
-                          <Replay sx={{ cursor: "pointer", opacity: "0.7" }} />
                         </Box>
                       ) : (
                         <TextField
@@ -282,7 +323,6 @@ const Bag = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        {/* )} */}
       </Box>
 
       <Dialog
@@ -300,14 +340,19 @@ const Bag = () => {
         <DialogContent>
           <Grid container spacing={2} pt={1}>
             <Grid item xs={6}>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
                 <TextField
                   name="bagId"
                   label="Bag ID"
-                  value={newBag.bagId}
-                  onChange={handleInputChange}
                   fullWidth
                   size="small"
+                  disabled
                 />
                 <TextField
                   name="bagDisplayName"
@@ -316,6 +361,8 @@ const Bag = () => {
                   onChange={handleInputChange}
                   fullWidth
                   size="small"
+                  error={!!formErrors.bagDisplayName}
+                  helperText={formErrors.bagDisplayName}
                 />
                 <TextField
                   name="bagLimit"
@@ -323,8 +370,11 @@ const Bag = () => {
                   type="number"
                   value={newBag.bagLimit}
                   onChange={handleInputChange}
+                  inputProps={{ maxLength: 2 }}
                   fullWidth
                   size="small"
+                  error={!!formErrors.bagLimit}
+                  helperText={formErrors.bagLimit}
                 />
                 <TextField
                   name="bagDisplay"
@@ -333,6 +383,8 @@ const Bag = () => {
                   onChange={handleInputChange}
                   fullWidth
                   size="small"
+                  error={!!formErrors.bagDisplay}
+                  helperText={formErrors.bagDisplay}
                 />
               </Box>
             </Grid>
@@ -346,6 +398,8 @@ const Bag = () => {
                   onChange={handleInputChange}
                   fullWidth
                   size="small"
+                  error={!!formErrors.cpc}
+                  helperText={formErrors.cpc}
                 >
                   {cpcOptions.map((option) => (
                     <MenuItem key={option} value={option}>
@@ -362,11 +416,12 @@ const Bag = () => {
                   fullWidth
                   size="small"
                   disabled={!newBag.cpc}
+                  error={!!formErrors.warehouse}
+                  helperText={formErrors.warehouse}
                 >
                   {newBag.cpc &&
-                    warehouseOptions[
-                      newBag.cpc as keyof typeof warehouseOptions
-                    ].map((option) => (
+                    // @ts-ignore
+                    warehouseOptions[newBag.cpc].map((option) => (
                       <MenuItem key={option} value={option}>
                         {option}
                       </MenuItem>
@@ -380,6 +435,8 @@ const Bag = () => {
                   onChange={handleInputChange}
                   fullWidth
                   size="small"
+                  error={!!formErrors.bagCategory}
+                  helperText={formErrors.bagCategory}
                 >
                   {bagCategoryOptions.map((option) => (
                     <MenuItem key={option} value={option}>
@@ -399,8 +456,12 @@ const Bag = () => {
             py: 2,
           }}
         >
-          <Button onClick={handleSaveBag} variant="contained" color="primary">
-            Save
+          <Button
+            onClick={handleSaveBag}
+            variant="contained"
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save Bag"}
           </Button>
           <Button
             onClick={handleCloseDialog}
