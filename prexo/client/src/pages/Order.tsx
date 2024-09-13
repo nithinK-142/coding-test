@@ -12,6 +12,10 @@ import {
   TableRow,
   TextField,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
@@ -35,10 +39,6 @@ const orderRequiredFields = [
   "Delivery Date",
 ] as const;
 
-// validation not required
-// GEP Order
-// Base Discount
-
 type OrderData = Record<(typeof orderRequiredFields)[number], string>;
 
 export default function Order() {
@@ -49,21 +49,53 @@ export default function Order() {
     row: number;
     field: keyof OrderData;
   } | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState<string>("");
+  const [isValidated, setIsValidated] = useState(false);
+  const [showValidate, setShowValidate] = useState(true);
 
-  const handleOrderDataValidated = (validData: OrderData[]) => {
-    setOrderData(validData);
-    setEditedData(validData);
+  const handleOrderDataUploaded = (uploadedData: OrderData[]) => {
+    setOrderData(uploadedData);
+    setEditedData(uploadedData);
+    setIsValidated(false);
+    setErrors({});
   };
 
   const validateField = (field: keyof OrderData, value: string) => {
     let errorMessage = "";
+
     if (!value.trim()) {
       errorMessage = `${field} is required.`;
-    } else if (field === "Order ID" && !/^\d+$/.test(value)) {
-      errorMessage = "Order ID must be numeric.";
+    } else if (field === "Order ID" && !/^[0-9-]+$/.test(value)) {
+      errorMessage = "Order ID should be numeric characters and hyphens.";
     }
-    // Add more field-specific validation logic here
+
     return errorMessage;
+  };
+
+  const validateAllData = (data: OrderData[]) => {
+    const newErrors: Record<string, string> = {};
+    const orderIds = new Set<string>();
+
+    data.forEach((row, rowIndex) => {
+      orderRequiredFields.forEach((field) => {
+        const error = validateField(field, row[field]);
+        if (error) {
+          newErrors[`${rowIndex}-${field}`] = error;
+        }
+      });
+
+      // Check for duplicate Order IDs
+      if (orderIds.has(row["Order ID"])) {
+        newErrors[`${rowIndex}-Order ID`] = "Duplicate Order ID detected.";
+      } else {
+        orderIds.add(row["Order ID"]);
+      }
+    });
+
+    setErrors(newErrors);
+    setIsValidated(true);
+    setShowValidate(false);
   };
 
   const handleCellEdit = (
@@ -73,28 +105,49 @@ export default function Order() {
   ) => {
     const newData = [...editedData];
     newData[rowIndex] = { ...newData[rowIndex], [field]: value };
-
-    // Validate the field and update the errors state
-    const error = validateField(field, value);
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [`${rowIndex}-${field}`]: error,
-    }));
-
     setEditedData(newData);
+
+    if (isValidated) {
+      const error = validateField(field, value);
+      setErrors((prev) => ({
+        ...prev,
+        [`${rowIndex}-${field}`]: error,
+      }));
+    }
   };
 
   const handleSaveChanges = () => {
-    setOrderData((prev) => [...prev, ...editedData]);
-    saveOrderData(orderData);
+    validateAllData(editedData);
+    if (Object.keys(errors).length === 0) {
+      setOrderData(editedData);
+      saveOrderData(editedData);
+    } else {
+      setDialogMessage("Please fix all errors before saving.");
+      setDialogOpen(true);
+    }
   };
 
   const saveOrderData = async (data: OrderData[]) => {
-    const { data: response } = await axios.post(
-      import.meta.env.VITE_API_URL + "/order/save",
-      data
-    );
-    console.log(response);
+    try {
+      const { data: response } = await axios.post(
+        import.meta.env.VITE_API_URL + "/order/save",
+        data
+      );
+      console.log(response);
+      setDialogMessage("Data saved successfully.");
+    } catch (error) {
+      setDialogMessage("Failed to save data.");
+    } finally {
+      setDialogOpen(true);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDataValidation = () => {
+    validateAllData(editedData);
   };
 
   return (
@@ -150,14 +203,41 @@ export default function Order() {
         </div>
       </Box>
 
-      <Box sx={{ mx: "auto" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <CSVReader
           requiredFields={orderRequiredFields}
-          onDataValidated={handleOrderDataValidated}
+          onDataValidated={handleOrderDataUploaded}
         />
+        {orderData.length > 0 && showValidate && (
+          <Button
+            variant="contained"
+            sx={{ fontSize: "12px", mt: 2 }}
+            onClick={handleDataValidation}
+          >
+            Validate Data
+          </Button>
+        )}
+        {isValidated && (
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ fontSize: "12px" }}
+            onClick={handleSaveChanges}
+            disabled={!isValidated}
+          >
+            Submit
+          </Button>
+        )}
       </Box>
       {editedData.length > 0 && (
-        <Box sx={{ mx: "auto", borderRadius: "4px" }}>
+        <Box sx={{ mx: "auto", borderRadius: "4px", mt: 2 }}>
           <TableContainer
             component={Paper}
             sx={{ maxHeight: 600, maxWidth: 1250, overflow: "auto" }}
@@ -189,42 +269,55 @@ export default function Order() {
                     {orderRequiredFields.map((field) => (
                       <TableCell
                         key={field}
-                        style={{
-                          position: "relative",
+                        sx={{
+                          minWidth: 220,
+                          paddingBlock: 1,
+                          paddingInline: 2,
                         }}
                       >
-                        <TextField
-                          value={row[field]}
-                          onChange={(e) =>
-                            handleCellEdit(rowIndex, field, e.target.value)
-                          }
-                          variant="outlined"
-                          fullWidth
-                          InputProps={{
-                            disableUnderline: true,
-                            style: {
-                              fontSize: "0.875rem",
-                              borderColor:
-                                activeCell?.row === rowIndex &&
-                                activeCell.field === field
-                                  ? "lightblue"
-                                  : "inherit",
-                            },
-                          }}
-                          onFocus={() =>
-                            setActiveCell({ row: rowIndex, field })
-                          }
-                          onBlur={() => setActiveCell(null)}
-                        />
-
-                        <Box sx={{ position: "absolute", top: 10, right: 6 }}>
-                          {!errors[`${rowIndex}-${field}`] ? (
-                            <Check sx={{ color: "green", marginLeft: 1 }} />
-                          ) : (
-                            <Close sx={{ color: "red", marginLeft: 1 }} />
+                        <Box sx={{ position: "relative" }}>
+                          <TextField
+                            value={row[field]}
+                            onChange={(e) =>
+                              handleCellEdit(rowIndex, field, e.target.value)
+                            }
+                            variant="outlined"
+                            fullWidth
+                            InputProps={{
+                              disableUnderline: true,
+                              style: {
+                                fontSize: "0.875rem",
+                                borderColor:
+                                  activeCell?.row === rowIndex &&
+                                  activeCell?.field === field
+                                    ? "lightblue"
+                                    : "inherit",
+                              },
+                            }}
+                            onFocus={() =>
+                              setActiveCell({ row: rowIndex, field })
+                            }
+                            onBlur={() => setActiveCell(null)}
+                          />
+                          {isValidated && (
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: "20%",
+                                right: -10,
+                                transform: "translateY(-50%)",
+                              }}
+                            >
+                              {!errors[`${rowIndex}-${field}`] ? (
+                                <Check sx={{ color: "green", marginLeft: 1 }} />
+                              ) : (
+                                <Close sx={{ color: "red", marginLeft: 1 }} />
+                              )}
+                            </Box>
                           )}
                         </Box>
-                        {errors[`${rowIndex}-${field}`] && (
+
+                        {isValidated && errors[`${rowIndex}-${field}`] && (
                           <Typography
                             variant="caption"
                             color="error"
@@ -240,17 +333,20 @@ export default function Order() {
               </TableBody>
             </Table>
           </TableContainer>
-          <Box mt={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSaveChanges}
-            >
-              Save Changes
-            </Button>
-          </Box>
         </Box>
       )}
+
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Save Data</DialogTitle>
+        <DialogContent>
+          <Typography>{dialogMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

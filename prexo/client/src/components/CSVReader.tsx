@@ -11,7 +11,9 @@ export default function CSVReader({
   requiredFields,
   onDataValidated,
 }: CSVReaderProps) {
+  const [file, setFile] = useState<File | null>(null); // Store the selected file
   const [error, setError] = useState<string | null>(null);
+  const [imported, setImported] = useState<boolean>(false); // State to manage button visibility
 
   const validateFields = (headers: string[]): boolean => {
     const missingFields = requiredFields.filter(
@@ -28,25 +30,37 @@ export default function CSVReader({
     return Object.values(row).some((value) => value !== null && value !== "");
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          if (validateFields(results.meta.fields || [])) {
-            const filteredData = results.data.filter(isRowNotEmpty);
-            setError(null);
-            onDataValidated(filteredData);
-          }
-        },
-        error: (error) => {
-          console.error("Error while parsing CSV:", error);
-          setError("Error parsing CSV file");
-        },
-      });
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile); // Store the file but don't parse it yet
+      setError(null); // Reset error when a new file is selected
+      setImported(false); // Reset imported state when a new file is selected
     }
+  };
+
+  const handleImportClick = () => {
+    if (!file) {
+      setError("Please select a CSV file to import.");
+      return;
+    }
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        if (validateFields(results.meta.fields || [])) {
+          const filteredData = results.data.filter(isRowNotEmpty);
+          setError(null); // Clear error if validation passes
+          onDataValidated(filteredData);
+          setImported(true); // Hide the Import button
+        }
+      },
+      error: (error) => {
+        console.error("Error while parsing CSV:", error);
+        setError("Error parsing CSV file");
+      },
+    });
   };
 
   return (
@@ -61,16 +75,26 @@ export default function CSVReader({
     >
       <input
         accept=".csv"
-        style={{ display: "none" }}
+        style={{
+          border: "1px solid #ccc",
+          padding: "5px",
+          borderRadius: "5px",
+        }}
         id="raised-button-file"
         type="file"
-        onChange={handleFileUpload}
+        onChange={handleFileChange}
       />
-      <label htmlFor="raised-button-file">
-        <Button variant="contained" component="span" sx={{ fontSize: "12px" }}>
-          Upload File
+
+      {!imported && (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2, fontSize: "12px" }}
+          onClick={handleImportClick}
+        >
+          Import
         </Button>
-      </label>
+      )}
 
       {error && (
         <Alert severity="error" sx={{ mt: 2 }}>
