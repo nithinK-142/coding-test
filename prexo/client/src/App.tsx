@@ -7,6 +7,7 @@ import BreadCrumbs from "./components/BreadCrumbs";
 import { PathContext, PathContextProvider } from "./context/path-context";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { ResultDialogProvider } from "./context/ResultDialogContext";
 
 function AuthenticatedApp() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -70,7 +71,9 @@ function App() {
   return (
     <AuthContextProvider>
       <PathContextProvider>
-        <AuthenticatedApp />
+        <ResultDialogProvider>
+          <AuthenticatedApp />
+        </ResultDialogProvider>
       </PathContextProvider>
     </AuthContextProvider>
   );

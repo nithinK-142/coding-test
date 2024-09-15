@@ -116,6 +116,7 @@ const Bag = () => {
   const validateForm = () => {
     const errors: Record<string, string> = {};
     Object.entries(newBag).forEach(([key, value]) => {
+      if (key === "bagId") return;
       if (!value) {
         errors[key] = "This field is required";
       }
@@ -167,6 +168,7 @@ const Bag = () => {
 
   const handleSaveBag = async () => {
     if (!validateForm()) {
+      console.log("Form validation failed");
       return;
     }
     const bagData = {
@@ -201,7 +203,7 @@ const Bag = () => {
   };
 
   const handleDeleteBag = async (bagId: string) => {
-    if (window.confirm("Are you sure you want to delete this bag?")) {
+    if (!window.confirm("Are you sure you want to delete this bag?")) {
       return;
     }
 
