@@ -12,13 +12,10 @@ import {
   TableRow,
   TextField,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
+import { useResultDialog } from "../context/ResultDialogContext";
 
 const orderRequiredFields = [
   "Order ID",
@@ -49,10 +46,9 @@ export default function Order() {
     row: number;
     field: keyof OrderData;
   } | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState<string>("");
   const [isValidated, setIsValidated] = useState(false);
   const [showValidate, setShowValidate] = useState(true);
+  const { successDialog, failureDialog } = useResultDialog();
 
   const handleOrderDataUploaded = (uploadedData: OrderData[]) => {
     setOrderData(uploadedData);
@@ -88,6 +84,7 @@ export default function Order() {
       // Check for duplicate Order IDs
       if (orderIds.has(row["Order ID"])) {
         newErrors[`${rowIndex}-Order ID`] = "Duplicate Order ID detected.";
+        failureDialog("Duplicate Order ID detected.");
       } else {
         orderIds.add(row["Order ID"]);
       }
@@ -124,8 +121,7 @@ export default function Order() {
       setOrderData(editedData);
       saveOrderData(editedData);
     } else {
-      setDialogMessage("Please fix all errors before saving.");
-      setDialogOpen(true);
+      failureDialog("Please fix all errors before saving.");
     }
   };
 
@@ -136,16 +132,10 @@ export default function Order() {
         data
       );
       console.log(response);
-      setDialogMessage("Data saved successfully.");
+      successDialog("Data saved successfully.");
     } catch (error) {
-      setDialogMessage("Failed to save data.");
-    } finally {
-      setDialogOpen(true);
+      failureDialog("Failed to save data. Please try again.");
     }
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
   };
 
   const handleDataValidation = () => {
@@ -220,7 +210,7 @@ export default function Order() {
         {orderData.length > 0 && showValidate && (
           <Button
             variant="contained"
-            sx={{ fontSize: "12px", mt: 2 }}
+            sx={{ fontSize: "12px" }}
             onClick={handleDataValidation}
           >
             Validate Data
@@ -284,6 +274,7 @@ export default function Order() {
                               handleCellEdit(rowIndex, field, e.target.value)
                             }
                             variant="outlined"
+                            size="small"
                             fullWidth
                             InputProps={{
                               disableUnderline: true,
@@ -337,18 +328,6 @@ export default function Order() {
           </TableContainer>
         </Box>
       )}
-
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Save Data</DialogTitle>
-        <DialogContent>
-          <Typography>{dialogMessage}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 }

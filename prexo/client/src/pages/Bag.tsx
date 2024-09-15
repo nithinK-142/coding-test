@@ -20,6 +20,7 @@ import {
   Grid,
 } from "@mui/material";
 import { Create, Delete } from "@mui/icons-material";
+import { useResultDialog } from "../context/ResultDialogContext";
 
 const Bag = () => {
   const bagRequiredFields = [
@@ -52,6 +53,7 @@ const Bag = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [editMode, setEditMode] = useState(false);
   const [editingBagId, setEditingBagId] = useState<string | null>(null);
+  const { successDialog, failureDialog } = useResultDialog();
 
   const handleOpenDialog = (bag?: BagData) => {
     if (bag) {
@@ -194,8 +196,10 @@ const Bag = () => {
       if (response.status === 200 || response.status === 201) {
         getBags();
         handleCloseDialog();
+        successDialog("Bag saved successfully!");
       }
     } catch (error) {
+      failureDialog("Failed to save bag. Please try again.");
       console.error("Error saving/updating bag:", error);
     } finally {
       setLoading(false);
@@ -214,8 +218,10 @@ const Bag = () => {
       );
       if (response.status === 200) {
         getBags();
+        successDialog("Bag deleted successfully!");
       }
     } catch (error) {
+      failureDialog("Failed to delete bag. Please try again.");
       console.error("Error deleting bag:", error);
     } finally {
       setLoading(false);
