@@ -35,12 +35,13 @@ const Bag = () => {
     "Actions",
   ] as const;
 
-  type BagData = Record<(typeof bagRequiredFields)[number], string>;
+  type BagData = Record<(typeof bagRequiredFields)[number] | "_id", string>;
 
   const [bags, setBags] = useState<BagData[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newBag, setNewBag] = useState({
+    bagId: "",
     cpc: "",
     bagDisplayName: "",
     warehouse: "",
@@ -49,24 +50,49 @@ const Bag = () => {
     bagDisplay: "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [editMode, setEditMode] = useState(false);
+  const [editingBagId, setEditingBagId] = useState<string | null>(null);
 
-  const handleOpenDialog = () => {
-    setNewBag((prev) => ({ ...prev }));
+  const handleOpenDialog = (bag?: BagData) => {
+    if (bag) {
+      setNewBag({
+        bagId: bag["Bag ID"],
+        cpc: bag.Location,
+        bagDisplayName: bag["Bag Display Name"],
+        warehouse: bag.Warehouse,
+        bagLimit: bag["Bag Limit"],
+        bagCategory: bag["Bag Type"],
+        bagDisplay: bag["Bag Display"],
+      });
+      setEditMode(true);
+      setEditingBagId(bag?._id);
+    } else {
+      setNewBag({
+        bagId: "",
+        cpc: "",
+        bagDisplayName: "",
+        warehouse: "",
+        bagLimit: "",
+        bagCategory: "",
+        bagDisplay: "",
+      });
+      setEditMode(false);
+      setEditingBagId(null);
+    }
     setDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setFormErrors({});
+    setEditMode(false);
+    setEditingBagId(null);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     if (name === "bagLimit") {
-      // Convert value to a number only if it's not an empty string
       const numValue = value === "" ? "" : Number(value);
-
-      // Ensure numValue is a number before comparison
       if (
         value === "" ||
         (typeof numValue === "number" &&
@@ -76,8 +102,9 @@ const Bag = () => {
       ) {
         setNewBag((prev) => ({ ...prev, [name]: value }));
       }
+    } else {
+      setNewBag((prev) => ({ ...prev, [name]: value }));
     }
-    setNewBag((prev) => ({ ...prev, [name]: value }));
 
     if (name === "cpc") {
       setNewBag((prev) => ({ ...prev, warehouse: "" }));
@@ -142,7 +169,7 @@ const Bag = () => {
     if (!validateForm()) {
       return;
     }
-    const newBagData = {
+    const bagData = {
       ...newBag,
       status: "No Status",
       creationDate: new Date().toISOString(),
@@ -150,25 +177,44 @@ const Bag = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/bag/saveBag`,
-        newBagData
-      );
-      if (response.status === 201) {
+      let response;
+      if (editMode) {
+        response = await axios.put(
+          `${import.meta.env.VITE_API_URL}/bag/editBag/${editingBagId}`,
+          bagData
+        );
+      } else {
+        response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/bag/saveBag`,
+          bagData
+        );
+      }
+      if (response.status === 200 || response.status === 201) {
         getBags();
         handleCloseDialog();
-        setNewBag({
-          cpc: "",
-          bagDisplayName: "",
-          warehouse: "",
-          bagLimit: "",
-          bagCategory: "",
-          bagDisplay: "",
-        });
       }
     } catch (error) {
+      console.error("Error saving/updating bag:", error);
+    } finally {
       setLoading(false);
-      console.error("Error saving bag:", error);
+    }
+  };
+
+  const handleDeleteBag = async (bagId: string) => {
+    if (window.confirm("Are you sure you want to delete this bag?")) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/bag/deleteBag/${bagId}`
+      );
+      if (response.status === 200) {
+        getBags();
+      }
+    } catch (error) {
+      console.error("Error deleting bag:", error);
     } finally {
       setLoading(false);
     }
@@ -181,10 +227,10 @@ const Bag = () => {
         `${import.meta.env.VITE_API_URL}/bag/getBags`
       );
       if (response.status === 200) {
+        // console.log(response.data);
         setBags(response.data.map((item: any) => formatResponse(item)));
       }
     } catch (error) {
-      setLoading(false);
       console.error("Error fetching bags:", error);
     } finally {
       setLoading(false);
@@ -199,6 +245,7 @@ const Bag = () => {
       day: "2-digit",
     });
     return {
+      _id: data._id,
       "Bag ID": data.bagId,
       Location: data.cpc,
       Warehouse: data.warehouse,
@@ -222,7 +269,7 @@ const Bag = () => {
         <Button
           variant="contained"
           sx={{ fontSize: "0.8rem", height: "auto" }}
-          onClick={handleOpenDialog}
+          onClick={() => handleOpenDialog()}
         >
           Add New Bag
         </Button>
@@ -246,13 +293,14 @@ const Bag = () => {
           <Table
             stickyHeader
             aria-label="delivery data table"
-            sx={{ minWidth: 1600 }}
+            sx={{ minWidth: 1400 }}
             size="small"
           >
             <TableHead>
               <TableRow>
                 <TableCell
                   sx={{
+                    // minWidth: 220,
                     fontWeight: "bold",
                     textAlign: "center",
                     backgroundColor: "gray",
@@ -264,6 +312,7 @@ const Bag = () => {
                   <TableCell
                     key={field}
                     sx={{
+                      // minWidth: 220,
                       fontWeight: "bold",
                       textAlign: "center",
                       backgroundColor: "gray",
@@ -276,10 +325,25 @@ const Bag = () => {
             </TableHead>
             <TableBody>
               {bags.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
+                <TableRow key={row._id}>
+                  <TableCell
+                    sx={
+                      {
+                        // minWidth: 220,
+                      }
+                    }
+                  >
+                    {index + 1}
+                  </TableCell>
                   {bagRequiredFields.map((field) => (
-                    <TableCell key={field}>
+                    <TableCell
+                      key={field}
+                      sx={
+                        {
+                          // minWidth: 120,
+                        }
+                      }
+                    >
                       {field === "Actions" ? (
                         <Box sx={{ display: "flex", gap: 1 }}>
                           <Create
@@ -288,6 +352,7 @@ const Bag = () => {
                               cursor: "pointer",
                               opacity: "0.7",
                             }}
+                            onClick={() => handleOpenDialog(row)}
                           />
                           <Delete
                             sx={{
@@ -295,13 +360,13 @@ const Bag = () => {
                               cursor: "pointer",
                               opacity: "0.7",
                             }}
+                            onClick={() => handleDeleteBag(row._id)}
                           />
                         </Box>
                       ) : (
                         <Typography
                           style={{
                             fontSize: "0.875rem",
-                            // border: "1px solid black",
                             padding: 0,
                             textAlign: "center",
                           }}
@@ -329,7 +394,9 @@ const Bag = () => {
           },
         }}
       >
-        <DialogTitle sx={{ fontSize: "1rem" }}>Bag</DialogTitle>
+        <DialogTitle sx={{ fontSize: "1rem" }}>
+          {editMode ? "Edit Bag" : "Add New Bag"}
+        </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} pt={1}>
             <Grid item xs={6}>
@@ -346,6 +413,7 @@ const Bag = () => {
                   fullWidth
                   size="small"
                   disabled
+                  value={newBag.bagId || ""}
                 />
                 <TextField
                   name="bagDisplayName"
@@ -413,8 +481,9 @@ const Bag = () => {
                   helperText={formErrors.warehouse}
                 >
                   {newBag.cpc &&
-                    // @ts-ignore
-                    warehouseOptions[newBag.cpc].map((option) => (
+                    warehouseOptions[
+                      newBag.cpc as keyof typeof warehouseOptions
+                    ].map((option) => (
                       <MenuItem key={option} value={option}>
                         {option}
                       </MenuItem>

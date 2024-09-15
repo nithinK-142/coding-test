@@ -7,7 +7,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import { useContext } from "react";
-import { PathContext } from "../context/path-context";
 import { AuthContext } from "../context/auth-context";
 
 export default function Navbar() {
@@ -15,9 +14,6 @@ export default function Navbar() {
     return text.toUpperCase();
   }
   const { username } = useContext(AuthContext);
-  const { pathnames } = useContext(PathContext);
-
-  console.log(pathnames);
 
   return (
     <Box>

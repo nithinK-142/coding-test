@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { BagModel, IBag } from "../model/bag.model";
 
 export const saveBag = async (req: Request, res: Response) => {
-  console.log("saving bag");
   try {
     const bagData: IBag = req.body;
 
@@ -29,32 +28,7 @@ export const saveBag = async (req: Request, res: Response) => {
   }
 };
 
-// export const saveBag = async (req: Request, res: Response) => {
-//   console.log("saving bag");
-//   try {
-//     const bagData: IBag = req.body;
-
-//     // Find the highest existing bagId
-//     const highestBag = await BagModel.findOne().sort("-bagId");
-
-//     const nextBagId = highestBag
-//       ? parseInt(highestBag.bagId!.split("-")[2]) + 1
-//       : 2000;
-
-//     // Set the new bagId
-//     bagData.bagId = `DDB-BLR-${nextBagId}`;
-
-//     const newBag = new BagModel(bagData);
-//     await newBag.save();
-//     res.status(201).json({ message: "Bag saved successfully", bag: newBag });
-//   } catch (error: any) {
-//     console.error("Error saving bag:", error);
-//     res.status(500).json({ message: "Error saving bag", error: error.message });
-//   }
-// };
-
 export const getBags = async (req: Request, res: Response) => {
-  console.log("getting bags");
   try {
     const bags = await BagModel.find().sort({ creationDate: -1 });
     res.status(200).json(bags);
@@ -66,70 +40,46 @@ export const getBags = async (req: Request, res: Response) => {
   }
 };
 
-// import type { Request, Response } from "express";
-// import { BagModel, IBag } from "../model/bag.model";
+export const editBag = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const updateData: Partial<IBag> = req.body;
 
-// export const saveBag = async (req: Request, res: Response) => {
-//   console.log("saving bag");
-//   try {
-//     const bagData: IBag = req.body;
+    const updatedBag = await BagModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
-//     // Find the latest bag ID and increment it
-//     const latestBag = await BagModel.findOne().sort({ bagId: -1 });
-//     const nextBagId = latestBag
-//       ? parseInt(latestBag.bagId.split("-").pop() || "2000") + 1
-//       : 2000;
-//     const newBagId = `DDB-BLR-${nextBagId}`;
+    if (!updatedBag) {
+      return res.status(404).json({ message: "Bag not found" });
+    }
 
-//     // Assign the new bag ID and save the bag
-//     const newBag = new BagModel({ ...bagData, bagId: newBagId });
-//     await newBag.save();
+    res
+      .status(200)
+      .json({ message: "Bag updated successfully", bag: updatedBag });
+  } catch (error: any) {
+    console.error("Error updating bag:", error);
+    res
+      .status(500)
+      .json({ message: "Error updating bag", error: error.message });
+  }
+};
 
-//     res.status(201).json({ message: "Bag saved successfully", bag: newBag });
-//   } catch (error: any) {
-//     console.error("Error saving bag:", error);
-//     res.status(500).json({ message: "Error saving bag", error: error.message });
-//   }
-// };
+export const deleteBag = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
-// export const getBags = async (req: Request, res: Response) => {
-//   console.log("getting bags");
-//   try {
-//     const bags = await BagModel.find().sort({ creationDate: -1 });
-//     res.status(200).json(bags);
-//   } catch (error: any) {
-//     console.error("Error fetching bags:", error);
-//     res
-//       .status(500)
-//       .json({ message: "Error fetching bags", error: error.message });
-//   }
-// };
+    const deletedBag = await BagModel.findByIdAndDelete(id);
 
-// import type { Request, Response } from "express";
-// import { BagModel, IBag } from "../model/bag.model";
+    if (!deletedBag) {
+      return res.status(404).json({ message: "Bag not found" });
+    }
 
-// export const saveBag = async (req: Request, res: Response) => {
-//   console.log("saving bag");
-//   try {
-//     const bagData: IBag = req.body;
-//     const newBag = new BagModel(bagData);
-//     await newBag.save();
-//     res.status(201).json({ message: "Bag saved successfully", bag: newBag });
-//   } catch (error: any) {
-//     console.error("Error saving bag:", error);
-//     res.status(500).json({ message: "Error saving bag", error: error.message });
-//   }
-// };
-
-// export const getBags = async (req: Request, res: Response) => {
-//   console.log("getting bags");
-//   try {
-//     const bags = await BagModel.find().sort({ creationDate: -1 });
-//     res.status(200).json(bags);
-//   } catch (error: any) {
-//     console.error("Error fetching bags:", error);
-//     res
-//       .status(500)
-//       .json({ message: "Error fetching bags", error: error.message });
-//   }
-// };
+    res.status(200).json({ message: "Bag deleted successfully" });
+  } catch (error: any) {
+    console.error("Error deleting bag:", error);
+    res
+      .status(500)
+      .json({ message: "Error deleting bag", error: error.message });
+  }
+};
