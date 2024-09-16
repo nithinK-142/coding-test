@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
 import { useResultDialog } from "../context/ResultDialogContext";
+import { Link } from "react-router-dom";
 
 const orderRequiredFields = [
   "Order ID",
@@ -177,6 +178,8 @@ export default function Order() {
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           <Button
             variant="contained"
+            component={Link}
+            to="/order"
             sx={{
               backgroundColor: "#E49B0F",
               fontSize: "0.8rem",
@@ -190,7 +193,12 @@ export default function Order() {
             variant="contained"
             sx={{ fontSize: "0.8rem", height: "auto" }}
           >
-            Download Sample Sheet
+            <a
+              href="/ORDER SHEET CSV FILE DEMO.csv"
+              style={{ textDecoration: "none", color: "white" }}
+            >
+              Download Sample Sheet
+            </a>
           </Button>
         </div>
       </Box>
