@@ -44,7 +44,9 @@ function AuthenticatedApp() {
             flexDirection: "column",
           }}
         >
-          {isAuthenticated && !isDashboard && <BreadCrumbs />}
+          <Outlet />
+
+          {/* {isAuthenticated && !isDashboard && <BreadCrumbs />}
           {isDashboard ? (
             <Outlet />
           ) : (
@@ -60,7 +62,7 @@ function AuthenticatedApp() {
             >
               <Outlet />
             </Box>
-          )}
+          )} */}
         </Box>
         {isAuthenticated && <Footer />}
       </Box>

@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
 import { useResultDialog } from "../context/ResultDialogContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useOrderSheetUploaded } from "../context/OrderSheetUploadedContext";
 
 const orderRequiredFields = [
@@ -59,6 +59,8 @@ export default function Order() {
     setIsValidated(false);
     setErrors({});
   };
+
+  const navigate = useNavigate();
 
   const validateField = (field: keyof OrderData, value: string) => {
     let errorMessage = "";
@@ -135,8 +137,9 @@ export default function Order() {
         import.meta.env.VITE_API_URL + "/order/save",
         data
       );
-      setOrderSheetUploaded(true);
       console.log(response);
+      setOrderSheetUploaded(true);
+      navigate("/order");
       successDialog("Data saved successfully.");
     } catch (error) {
       failureDialog("Failed to save data. Please try again.");
@@ -244,7 +247,7 @@ export default function Order() {
         <Box sx={{ mx: "auto", borderRadius: "4px", mt: 2 }}>
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 600, maxWidth: 1250, overflow: "auto" }}
+            sx={{ maxHeight: 600, maxWidth: 1300, overflow: "auto" }}
           >
             <Table
               stickyHeader

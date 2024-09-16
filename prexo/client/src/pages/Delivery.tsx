@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
 import { useResultDialog } from "../context/ResultDialogContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const deliveryRequiredFields = [
   "Tracking ID",
@@ -47,6 +47,7 @@ export default function Delivery() {
   const [isValidated, setIsValidated] = useState(false);
   const [showValidate, setShowValidate] = useState(true);
   const { successDialog, failureDialog } = useResultDialog();
+  const navigate = useNavigate();
 
   const handleDeliveryDataValidated = (validData: DeliveryData[]) => {
     setDeliveryData(validData);
@@ -72,6 +73,8 @@ export default function Delivery() {
       errorMessage = `${field} is required.`;
     } else if (field === "Order ID" && !/^[0-9-]+$/.test(value)) {
       errorMessage = "Order ID should be numeric characters and hyphens.";
+    } else if (field === "Tracking ID" && !/^\d{8}$|^\d{12}$/.test(value)) {
+      errorMessage = "Tracking ID must be either 8 or 12 digits.";
     }
 
     return errorMessage;
@@ -80,6 +83,7 @@ export default function Delivery() {
   const validateAllData = (data: DeliveryData[]) => {
     const newErrors: Record<string, string> = {};
     const orderIds = new Set<string>();
+    const trackingIds = new Set<string>();
 
     data.forEach((row, rowIndex) => {
       deliveryRequiredFields.forEach((field) => {
@@ -105,6 +109,14 @@ export default function Delivery() {
         );
       } else {
         orderIds.add(row["Tracking ID"]);
+      }
+
+      if (trackingIds.has(row["Tracking ID"])) {
+        newErrors[`${rowIndex}-Tracking ID`] =
+          "Duplicate Tracking ID detected.";
+        failureDialog("Duplicate Tracking ID detected.");
+      } else {
+        trackingIds.add(row["Tracking ID"]);
       }
     });
 
@@ -152,6 +164,7 @@ export default function Delivery() {
       );
       console.log(response);
       successDialog("Data saved successfully.");
+      navigate("/delivery");
     } catch (error) {
       failureDialog("Failed to save data. Please try again.");
     }
@@ -256,7 +269,10 @@ export default function Delivery() {
         <Box sx={{ mx: "auto", borderRadius: "4px", mt: 2 }}>
           <TableContainer
             component={Paper}
-            sx={{ maxHeight: 600, maxWidth: 1250, overflow: "auto" }}
+            sx={{
+              maxHeight: 600,
+              maxWidth: 1300,
+            }}
           >
             <Table
               stickyHeader
