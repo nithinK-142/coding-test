@@ -17,3 +17,19 @@ export function generateFormattedDateTime(date: Date): string {
 
   return formattedDate;
 }
+
+export function incrementString(input: string): string {
+  // Split the string into non-numeric and numeric parts
+  const [prefix, numericPart] = input.split(/(\d+)$/).filter(Boolean);
+
+  if (!numericPart) {
+    return input + "1"; // If no number at the end, append 1
+  }
+
+  // Parse the numeric part, increment it, and pad with zeros
+  const incrementedNum = (parseInt(numericPart, 10) + 1)
+    .toString()
+    .padStart(numericPart.length, "0");
+
+  return prefix + incrementedNum;
+}

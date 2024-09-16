@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import { Create, Delete } from "@mui/icons-material";
 import { useResultDialog } from "../context/ResultDialogContext";
+import { incrementString } from "../utils";
 
 const Bag = () => {
   const bagRequiredFields = [
@@ -54,6 +55,7 @@ const Bag = () => {
   const [editMode, setEditMode] = useState(false);
   const [editingBagId, setEditingBagId] = useState<string | null>(null);
   const { successDialog, failureDialog } = useResultDialog();
+  const [lastBagId, setLastBagId] = useState<string>("");
 
   const handleOpenDialog = (bag?: BagData) => {
     if (bag) {
@@ -235,8 +237,8 @@ const Bag = () => {
         `${import.meta.env.VITE_API_URL}/bag/getBags`
       );
       if (response.status === 200) {
-        // console.log(response.data);
         setBags(response.data.map((item: any) => formatResponse(item)));
+        setLastBagId(incrementString(response.data[0].bagId));
       }
     } catch (error) {
       console.error("Error fetching bags:", error);
@@ -430,7 +432,7 @@ const Bag = () => {
                   fullWidth
                   size="small"
                   disabled
-                  value={newBag.bagId || ""}
+                  value={newBag.bagId || lastBagId}
                 />
                 <TextField
                   name="bagDisplayName"
