@@ -17,6 +17,7 @@ import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
 import { useResultDialog } from "../context/ResultDialogContext";
 import { Link } from "react-router-dom";
+import { useOrderSheetUploaded } from "../context/OrderSheetUploadedContext";
 
 const orderRequiredFields = [
   "Order ID",
@@ -50,6 +51,7 @@ export default function Order() {
   const [isValidated, setIsValidated] = useState(false);
   const [showValidate, setShowValidate] = useState(true);
   const { successDialog, failureDialog } = useResultDialog();
+  const { setOrderSheetUploaded } = useOrderSheetUploaded();
 
   const handleOrderDataUploaded = (uploadedData: OrderData[]) => {
     setOrderData(uploadedData);
@@ -121,6 +123,7 @@ export default function Order() {
     if (Object.keys(errors).length === 0) {
       setOrderData(editedData);
       saveOrderData(editedData);
+      successDialog("Data validation.");
     } else {
       failureDialog("Please fix all errors before saving.");
     }
@@ -132,6 +135,7 @@ export default function Order() {
         import.meta.env.VITE_API_URL + "/order/save",
         data
       );
+      setOrderSheetUploaded(true);
       console.log(response);
       successDialog("Data saved successfully.");
     } catch (error) {

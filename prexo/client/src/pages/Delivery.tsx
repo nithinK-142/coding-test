@@ -138,6 +138,7 @@ export default function Delivery() {
     if (Object.keys(errors).length === 0) {
       setDeliveryData(editedData);
       saveDeliveryData(editedData);
+      successDialog("Data validated.");
     } else {
       failureDialog("Please fix all errors before saving.");
     }

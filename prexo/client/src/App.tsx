@@ -8,6 +8,7 @@ import { PathContext, PathContextProvider } from "./context/path-context";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { ResultDialogProvider } from "./context/ResultDialogContext";
+import { OrderSheetUploadedProvider } from "./context/OrderSheetUploadedContext";
 
 function AuthenticatedApp() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -71,9 +72,11 @@ function App() {
   return (
     <AuthContextProvider>
       <PathContextProvider>
-        <ResultDialogProvider>
-          <AuthenticatedApp />
-        </ResultDialogProvider>
+        <OrderSheetUploadedProvider>
+          <ResultDialogProvider>
+            <AuthenticatedApp />
+          </ResultDialogProvider>
+        </OrderSheetUploadedProvider>
       </PathContextProvider>
     </AuthContextProvider>
   );

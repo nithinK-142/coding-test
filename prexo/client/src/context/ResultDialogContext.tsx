@@ -76,8 +76,10 @@ export const ResultDialogProvider: React.FC<ResultDialogProviderProps> = ({
         onClose={handleClose}
         TransitionComponent={Transition}
         transitionDuration={500}
+        maxWidth="xs"
+        fullWidth
       >
-        <DialogTitle>
+        <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
           {dialogStatus === "success" ? "Success" : "Failure"}
         </DialogTitle>
         <DialogContent>
@@ -87,12 +89,20 @@ export const ResultDialogProvider: React.FC<ResultDialogProviderProps> = ({
               alt={dialogStatus === "success" ? "Success" : "Failure"}
               style={{ width: 50, height: 50, marginBottom: 16 }}
             />
-            <DialogContentText>{dialogMessage}</DialogContentText>
+            <DialogContentText
+              sx={{
+                textAlign: "center",
+                fontWeight: "bold",
+                fontSize: "1.2rem",
+              }}
+            >
+              {dialogMessage}
+            </DialogContentText>
           </div>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: "center" }}>
           <Button onClick={handleClose} color="primary">
-            Close
+            Okay
           </Button>
         </DialogActions>
       </Dialog>
