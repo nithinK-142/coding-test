@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { saveOrder } from "../controller/order.controller";
+import { ordersExists, saveOrder } from "../controller/order.controller";
 
 const router = Router();
 
 router.post("/save", saveOrder);
+router.post("/orders-exists", ordersExists);
 
 export { router as orderRouter };

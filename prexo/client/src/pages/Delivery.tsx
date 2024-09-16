@@ -80,11 +80,39 @@ export default function Delivery() {
     return errorMessage;
   };
 
-  const validateAllData = (data: DeliveryData[]) => {
+  const validateAllData = async (data: DeliveryData[]) => {
     const newErrors: Record<string, string> = {};
     const orderIds = new Set<string>();
     const trackingIds = new Set<string>();
 
+    // Extract all Order IDs first
+    const allOrderIds = data.map((row) => row["Order ID"]);
+
+    // Check if Order IDs exist in the backend
+    let existingOrderIds: Set<string>;
+    try {
+      const orderIdsExist = await orderIdsExists(allOrderIds);
+      if (!orderIdsExist) {
+        failureDialog("Order sheet not imported.");
+        newErrors["generalError"] =
+          "One or more Order IDs do not exist in the system.";
+        setErrors(newErrors);
+        setIsValidated(true);
+        setShowValidate(false);
+        return; // Exit early if Order IDs don't exist
+      }
+      existingOrderIds = new Set(allOrderIds);
+    } catch (error) {
+      console.error("Error checking Order IDs:", error);
+      failureDialog("Failed to verify Order IDs. Please try again.");
+      newErrors["generalError"] = "Failed to verify Order IDs.";
+      setErrors(newErrors);
+      setIsValidated(true);
+      setShowValidate(false);
+      return; // Exit early if there's an error
+    }
+
+    // Proceed with other validations
     data.forEach((row, rowIndex) => {
       deliveryRequiredFields.forEach((field) => {
         const error = validateField(field, row[field]);
@@ -101,14 +129,10 @@ export default function Delivery() {
         orderIds.add(row["Order ID"]);
       }
 
-      if (orderIds.has(row["Tracking ID"])) {
-        newErrors[`${rowIndex}-Tracking ID`] =
-          "Duplicate Tracking ID detected.";
-        failureDialog(
-          "Duplicate Tracking ID detected. Please check your data."
-        );
-      } else {
-        orderIds.add(row["Tracking ID"]);
+      // Check if Order ID exists (this is now redundant but kept for completeness)
+      if (!existingOrderIds.has(row["Order ID"])) {
+        newErrors[`${rowIndex}-Order ID`] =
+          "Duplicate Order ID detected. Please check your data.";
       }
 
       if (trackingIds.has(row["Tracking ID"])) {
@@ -157,6 +181,7 @@ export default function Delivery() {
   };
 
   const saveDeliveryData = async (data: DeliveryData[]) => {
+    console.log(data);
     try {
       const { data: response } = await axios.post(
         import.meta.env.VITE_API_URL + "/delivery/save",
@@ -172,6 +197,21 @@ export default function Delivery() {
 
   const handleDataValidation = () => {
     validateAllData(editedData);
+  };
+
+  const orderIdsExists = async (data: string[]): Promise<boolean> => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/order/orders-exists`,
+        data
+      );
+      console.log("Order existence check response:", response.data);
+      console.log(response.data.allOrdersExist);
+      return response.data.allOrdersExist;
+    } catch (error: any) {
+      console.error("Error checking order existence:", error);
+      return error;
+    }
   };
 
   return (

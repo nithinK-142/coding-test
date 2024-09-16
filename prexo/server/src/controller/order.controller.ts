@@ -2,12 +2,49 @@ import type { Request, Response } from "express";
 import orderModel, { IOrder } from "../model/order.model";
 
 export const saveOrder = async (req: Request, res: Response) => {
-  const data = req.body;
+  try {
+    const data = req.body;
 
-  const filteredOrderData = transformOrderData(data);
+    const filteredOrderData = transformOrderData(data);
 
-  await orderModel.insertMany(filteredOrderData);
-  return res.send("order saved");
+    await orderModel.insertMany(filteredOrderData);
+    return res.send("order saved");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const ordersExists = async (req: Request, res: Response) => {
+  try {
+    const orderIds: string[] = req.body;
+
+    if (!Array.isArray(orderIds) || orderIds.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Invalid input: Expected an array of order IDs" });
+    }
+
+    const existingOrders = await orderModel.find(
+      { orderId: { $in: orderIds } },
+      "orderId"
+    );
+
+    const existingOrderIds = new Set(
+      existingOrders.map((order) => order.orderId)
+    );
+
+    const allOrdersExist = orderIds.every((id) => existingOrderIds.has(id));
+
+    console.log("All orders exist:", allOrdersExist);
+
+    return res.json({
+      allOrdersExist,
+      existingOrderIds: Array.from(existingOrderIds),
+    });
+  } catch (error) {
+    console.error("Error in ordersExists:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const transformOrderData = (rawData: any[]): IOrder[] => {
