@@ -145,6 +145,7 @@ export default function Sidebar() {
             >
               <span style={{ opacity: 0.7 }}>PAGES</span>
             </Typography>
+
             {username === "mis" ? (
               <>
                 <SubMenu
@@ -245,7 +246,6 @@ export default function Sidebar() {
                   icon={<ShoppingCart style={{ fontSize: "18px" }} />}
                   label="Tray Transfer"
                 ></SubMenu>
-
                 <SubMenu
                   icon={<TrackChanges style={{ fontSize: "18px" }} />}
                   label="Rack Change"
@@ -259,7 +259,7 @@ export default function Sidebar() {
                   label="Report"
                 ></SubMenu>
               </>
-            ) : (
+            ) : username === "supadmin" ? (
               <SubMenu
                 icon={<Brightness1 style={{ fontSize: "12px" }} />}
                 label="Masters"
@@ -276,7 +276,15 @@ export default function Sidebar() {
                   <span>Bags</span>
                 </MenuItem>
               </SubMenu>
+            ) : (
+              <MenuItem
+                component={<Link to="/bagging" />}
+                icon={<Assignment style={{ fontSize: "18px" }} />}
+              >
+                Bagging
+              </MenuItem>
             )}
+
             <MenuItem
               icon={<ExitToApp style={{ fontSize: "18px" }} />}
               onClick={handleLogoutClick}

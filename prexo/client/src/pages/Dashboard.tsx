@@ -2,11 +2,43 @@ import { Typography } from "@mui/material";
 import Card from "../components/Card";
 import { Box, Grid } from "@mui/system";
 import { dashboardItems } from "../constants";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/auth-context";
+import axios from "axios";
+
+export type CountType = {
+  orderCount: number;
+  deliveryCount: number;
+};
 
 const Dashboard = () => {
   const { username } = useContext(AuthContext);
+
+  const [count, setCount] = useState<CountType>({
+    orderCount: 0,
+    deliveryCount: 0,
+  });
+
+  useEffect(() => {
+    async function getCountData() {
+      try {
+        const [deliveriesResponse, ordersResponse] = await Promise.all([
+          axios.get(import.meta.env.VITE_API_URL + "/delivery/deliveries"),
+          axios.get(import.meta.env.VITE_API_URL + "/order/orders"),
+        ]);
+
+        const deliveryCount = deliveriesResponse.data.length;
+        const orderCount = ordersResponse.data.length;
+
+        setCount({ deliveryCount, orderCount });
+      } catch (error) {
+        console.error("Error fetching count data", error);
+      }
+    }
+
+    getCountData();
+  }, []);
+
   return (
     <Box>
       <Typography
@@ -27,7 +59,7 @@ const Dashboard = () => {
           }}
         >
           {dashboardItems.map((item, index) => (
-            <Card key={index} dashboardItem={item} />
+            <Card key={index} dashboardItem={item} count={count} />
           ))}
         </Grid>
       )}

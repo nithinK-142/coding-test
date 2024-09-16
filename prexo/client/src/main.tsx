@@ -17,6 +17,7 @@ import Delivery from "./pages/Delivery.tsx";
 import DeliveryInport from "./pages/Delivery-Import.tsx";
 import { NotFound } from "./pages/NotFound.tsx";
 import Bag from "./pages/Bag.tsx";
+import BaggingAgent from "./pages/BaggingAgent.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -67,6 +68,14 @@ const router = createBrowserRouter(
         element={
           <ProtectedRoute>
             <Bag />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="bagging"
+        element={
+          <ProtectedRoute>
+            <BaggingAgent />
           </ProtectedRoute>
         }
       />

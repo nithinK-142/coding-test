@@ -42,7 +42,11 @@ export default function Navbar() {
             }}
           >
             {capitalizeText(
-              username === "mis" ? "Processing MIS Panel" : "Super Admin Panel"
+              username === "mis"
+                ? "Processing MIS Panel"
+                : username === "supadmin"
+                ? "Super Admin Panel"
+                : "Processing Bagging Panel"
             )}
           </Typography>
           {/* User avatar with name */}
@@ -52,7 +56,11 @@ export default function Navbar() {
               variant="body1"
               sx={{ fontWeight: "medium", letterSpacing: "-0.025em" }}
             >
-              {username === "mis" ? "MIS User" : "Sup Admin"}
+              {username === "mis"
+                ? "MIS User"
+                : username === "supadmin"
+                ? "Sup Admin"
+                : "Bagging Agent"}
             </Typography>
             <Avatar sx={{ bgcolor: "#1976d2", height: 32, width: 32 }}>
               MIS

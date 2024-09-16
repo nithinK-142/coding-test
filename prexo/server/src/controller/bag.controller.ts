@@ -83,3 +83,22 @@ export const deleteBag = async (req: Request, res: Response) => {
       .json({ message: "Error deleting bag", error: error.message });
   }
 };
+
+export const checkBag = async (req: Request, res: Response) => {
+  try {
+    const { bagId } = req.params;
+
+    const existingBag = await BagModel.findOne({ bagId });
+
+    if (!existingBag) {
+      return res.status(404).json({ message: "Bag not found", isValid: false });
+    }
+
+    res.status(200).json({ message: "Bag found", isValid: true });
+  } catch (error: any) {
+    console.error("Error checking  bag:", error);
+    res
+      .status(500)
+      .json({ message: "Error checking bag", error: error.message });
+  }
+};

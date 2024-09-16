@@ -50,7 +50,6 @@ export const ordersExists = async (req: Request, res: Response) => {
 export const getOrders = async (req: Request, res: Response) => {
   try {
     const orders = await orderModel.find();
-    console.log(orders);
     return res.send(orders);
   } catch (error) {
     console.log(error);
