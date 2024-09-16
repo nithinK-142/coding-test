@@ -37,13 +37,14 @@ export interface IOrder {
 }
 
 const BaggingAgent = () => {
+  const { successDialog, failureDialog } = useResultDialog();
   const [isBagValid, setIsBagValid] = useState(false);
   const [bagId, setBagId] = useState("");
   const [awbnNo, setAwbnNo] = useState("");
   const [bags, setBags] = useState<IOrder[]>([]);
-  const { successDialog, failureDialog } = useResultDialog();
-
   const [bagData, setBagData] = useState<IOrder[]>([]);
+  const [valid, setValid] = useState(0);
+  const [duplicated, setDuplicate] = useState(0);
 
   const checkIsBagValid = async () => {
     try {
@@ -51,10 +52,10 @@ const BaggingAgent = () => {
         `${import.meta.env.VITE_API_URL}/bag/checkBag/${bagId}`
       );
       setIsBagValid(response.data);
-      console.log(response.data);
 
       if (response.data) {
         successDialog("Bag is valid");
+        setValid((prev) => prev + 1);
         fetchBagData();
       } else {
         failureDialog("Bag is Invalid");
@@ -139,6 +140,50 @@ const BaggingAgent = () => {
             />
           )}
         </Box>
+      </Box>
+
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <div></div>
+        <div style={{ display: "flex", gap: 10, paddingRight: 10 }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ fontSize: "14px", marginBottom: "8px" }}>Total</span>
+            <span style={{ fontSize: "22px", fontWeight: 600 }}>
+              {bagData.length}/40
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ fontSize: "14px", marginBottom: "8px" }}>valid</span>
+
+            <span style={{ fontSize: "22px", fontWeight: 600 }}>{valid}</span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ fontSize: "14px", marginBottom: "8px" }}>
+              Duplicate
+            </span>
+
+            <span style={{ fontSize: "22px", fontWeight: 600 }}>1</span>
+          </div>
+        </div>
       </Box>
 
       {isBagValid && bagData.length > 0 && (
