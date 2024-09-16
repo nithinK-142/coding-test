@@ -14,7 +14,7 @@ function AuthenticatedApp() {
   const { isAuthenticated } = useContext(AuthContext);
   const { pathName } = useContext(PathContext);
 
-  const isDashboard = pathName === "/";
+  const isDashboard = pathName === "/" || pathName === "/bag";
 
   return (
     <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>

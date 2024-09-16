@@ -35,7 +35,7 @@ import {
   TrackChanges,
   ArtTrack,
   Assignment,
-  Save,
+  Brightness1,
 } from "@mui/icons-material";
 import { AuthContext } from "../context/auth-context";
 
@@ -260,14 +260,22 @@ export default function Sidebar() {
                 ></SubMenu>
               </>
             ) : (
-              <MenuItem
-                icon={<Save style={{ fontSize: "18px" }} />}
-                component={<Link to="/bag" />}
-                active={activeSubMenu === "delivery"}
-                onClick={() => handleSubMenuClick("delivery")}
+              <SubMenu
+                icon={<Brightness1 style={{ fontSize: "12px" }} />}
+                label="Masters"
               >
-                Bagging
-              </MenuItem>
+                <MenuItem
+                  component={<Link to="/bag" />}
+                  active={activeSubMenu === "delivery"}
+                  onClick={() => handleSubMenuClick("delivery")}
+                  style={{
+                    paddingLeft: "1.2rem",
+                  }}
+                >
+                  <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
+                  <span>Bags</span>
+                </MenuItem>
+              </SubMenu>
             )}
             <MenuItem
               icon={<ExitToApp style={{ fontSize: "18px" }} />}

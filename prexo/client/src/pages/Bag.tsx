@@ -294,10 +294,19 @@ const Bag = () => {
         </Button>
       </div>
 
-      <Typography sx={{ mt: 2 }}>All Bags</Typography>
+      <Typography sx={{ my: 2, fontWeight: "bold", fontSize: "1.2rem" }}>
+        All Bags
+      </Typography>
 
       <Box sx={{ mx: "auto", borderRadius: "4px" }}>
-        <TableContainer component={Paper}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            "&::-webkit-scrollbar": { display: "none" }, // For Webkit browsers
+            msOverflowStyle: "none", // For IE and Edge
+            scrollbarWidth: "none", // For Firefox
+          }}
+        >
           <Table
             stickyHeader
             aria-label="delivery data table"
