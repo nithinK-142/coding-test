@@ -12,7 +12,9 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Order from "./pages/Order.tsx";
+import OrderImport from "./pages/Order-Import.tsx";
 import Delivery from "./pages/Delivery.tsx";
+import DeliveryInport from "./pages/Delivery-Import.tsx";
 import { NotFound } from "./pages/NotFound.tsx";
 import Bag from "./pages/Bag.tsx";
 
@@ -28,7 +30,7 @@ const router = createBrowserRouter(
         }
       />
       <Route
-        path="order/bulk-import"
+        path="order/"
         element={
           <ProtectedRoute>
             <Order />
@@ -36,10 +38,26 @@ const router = createBrowserRouter(
         }
       />
       <Route
-        path="delivery/bulk-import"
+        path="order/bulk-import"
+        element={
+          <ProtectedRoute>
+            <OrderImport />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="delivery"
         element={
           <ProtectedRoute>
             <Delivery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="delivery/bulk-import"
+        element={
+          <ProtectedRoute>
+            <DeliveryInport />
           </ProtectedRoute>
         }
       />

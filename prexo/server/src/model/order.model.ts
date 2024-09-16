@@ -17,6 +17,7 @@ export interface IOrder {
   partnerPurchasePrice: number;
   trackingId: string;
   deliveryDate: Date;
+  importedAt: Date;
 }
 
 const OrderSchema = new Schema({
@@ -36,6 +37,7 @@ const OrderSchema = new Schema({
   partnerPurchasePrice: { type: Number, required: true },
   trackingId: { type: String, required: true },
   deliveryDate: { type: Date, required: true },
+  importedAt: { type: Date, required: true },
 });
 
 const Order = model<IOrder>("Order", OrderSchema);

@@ -44,10 +44,10 @@ function AuthenticatedApp() {
             flexDirection: "column",
           }}
         >
+          {isAuthenticated && !isDashboard && <BreadCrumbs />}
           <Outlet />
 
-          {/* {isAuthenticated && !isDashboard && <BreadCrumbs />}
-          {isDashboard ? (
+          {/* {isDashboard ? (
             <Outlet />
           ) : (
             <Box
@@ -74,11 +74,11 @@ function App() {
   return (
     <AuthContextProvider>
       <PathContextProvider>
-        <OrderSheetUploadedProvider>
-          <ResultDialogProvider>
-            <AuthenticatedApp />
-          </ResultDialogProvider>
-        </OrderSheetUploadedProvider>
+        {/* <OrderSheetUploadedProvider> */}
+        <ResultDialogProvider>
+          <AuthenticatedApp />
+        </ResultDialogProvider>
+        {/* </OrderSheetUploadedProvider> */}
       </PathContextProvider>
     </AuthContextProvider>
   );

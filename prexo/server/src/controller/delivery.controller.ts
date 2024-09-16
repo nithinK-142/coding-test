@@ -15,6 +15,16 @@ export const saveDelivery = async (req: Request, res: Response) => {
   }
 };
 
+export const getDeliveries = async (req: Request, res: Response) => {
+  try {
+    const deliveries = await DeliveryModel.find();
+    console.log(deliveries);
+    return res.send(deliveries);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const transformDeliveryData = (rawData: any[]): IDelivery[] => {
   return rawData.map((delivery) => ({
     trackingId: delivery["Tracking ID"],

@@ -4,7 +4,7 @@ import orderModel, { IOrder } from "../model/order.model";
 export const saveOrder = async (req: Request, res: Response) => {
   try {
     const data = req.body;
-
+    console.log(req.body);
     const filteredOrderData = transformOrderData(data);
 
     await orderModel.insertMany(filteredOrderData);
@@ -47,6 +47,15 @@ export const ordersExists = async (req: Request, res: Response) => {
   }
 };
 
+export const getOrders = async (req: Request, res: Response) => {
+  try {
+    const orders = await orderModel.find();
+    console.log(orders);
+    return res.send(orders);
+  } catch (error) {
+    console.log(error);
+  }
+};
 const transformOrderData = (rawData: any[]): IOrder[] => {
   return rawData.map((order) => ({
     orderId: order["Order ID"],
@@ -65,5 +74,6 @@ const transformOrderData = (rawData: any[]): IOrder[] => {
     partnerPurchasePrice: Number(order["Partner Purchase Price"]),
     trackingId: order["Tracking ID"],
     deliveryDate: new Date(order["Delivery Date"]),
+    importedAt: new Date(),
   }));
 };

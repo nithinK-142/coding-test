@@ -1,8 +1,13 @@
 import { Router } from "express";
-import { ordersExists, saveOrder } from "../controller/order.controller";
+import {
+  getOrders,
+  ordersExists,
+  saveOrder,
+} from "../controller/order.controller";
 
 const router = Router();
 
+router.get("/orders", getOrders);
 router.post("/save", saveOrder);
 router.post("/orders-exists", ordersExists);
 

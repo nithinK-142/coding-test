@@ -152,7 +152,7 @@ export default function Sidebar() {
                   label="Orders"
                 >
                   <MenuItem
-                    component={<Link to="/order/bulk-import" />}
+                    component={<Link to="/order" />}
                     active={activeSubMenu === "order"}
                     onClick={() => handleSubMenuClick("order")}
                     style={{
@@ -180,7 +180,7 @@ export default function Sidebar() {
                   label="Delivery"
                 >
                   <MenuItem
-                    component={<Link to="/delivery/bulk-import" />}
+                    component={<Link to="/delivery" />}
                     active={activeSubMenu === "delivery"}
                     onClick={() => handleSubMenuClick("delivery")}
                     style={{

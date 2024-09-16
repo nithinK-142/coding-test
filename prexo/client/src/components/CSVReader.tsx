@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import Papa from "papaparse";
 import { Button, Alert, AlertTitle, Box } from "@mui/material";
-import { useOrderSheetUploaded } from "../context/OrderSheetUploadedContext";
+// import { useOrderSheetUploaded } from "../context/OrderSheetUploadedContext";
 import { PathContext } from "../context/path-context";
 
 interface CSVReaderProps {
@@ -16,7 +16,7 @@ export default function CSVReader({
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [imported, setImported] = useState<boolean>(false);
-  const { isOrderSheetUploaded } = useOrderSheetUploaded();
+  // const { isOrderSheetUploaded } = useOrderSheetUploaded();
   const { pathnames } = useContext(PathContext);
 
   const validateFields = (headers: string[]): boolean => {
@@ -49,10 +49,10 @@ export default function CSVReader({
       return;
     }
 
-    if (pathnames[0] === "Delivery" && !isOrderSheetUploaded) {
-      setError("Please upload order sheet before importing delivery sheet.");
-      return;
-    }
+    // if (pathnames[0] === "Delivery" && !isOrderSheetUploaded) {
+    //   setError("Please upload order sheet before importing delivery sheet.");
+    //   return;
+    // }
 
     Papa.parse(file, {
       header: true,
