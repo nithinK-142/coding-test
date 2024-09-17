@@ -9,7 +9,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
@@ -36,15 +37,20 @@ export interface IOrder {
   importedAt: string;
 }
 
+// Extend IOrder to include the isDuplicate property
+interface IOrderWithDuplicateFlag extends IOrder {
+  isDuplicate?: boolean;
+}
+
 const BaggingAgent = () => {
   const { successDialog, failureDialog } = useResultDialog();
   const [isBagValid, setIsBagValid] = useState(false);
   const [bagId, setBagId] = useState("");
   const [awbnNo, setAwbnNo] = useState("");
   const [bags, setBags] = useState<IOrder[]>([]);
-  const [bagData, setBagData] = useState<IOrder[]>([]);
+  const [bagData, setBagData] = useState<IOrderWithDuplicateFlag[]>([]);
   const [valid, setValid] = useState(0);
-  const [duplicated, setDuplicate] = useState(0);
+  const [duplicated, setDuplicated] = useState(0);
 
   const checkIsBagValid = async () => {
     try {
@@ -79,15 +85,56 @@ const BaggingAgent = () => {
   };
 
   const checkIsAWBNValid = async () => {
-    // @ts-ignore
-    const newData: IOrder[] = bags
+    const newData: IOrderWithDuplicateFlag[] = bags
+      .filter((bag) => bag.trackingId === awbnNo)
       .map((bag) => ({
-        trackingId: bag.trackingId,
-        orderId: bag.orderId,
+        ...bag,
         deliveryDate: generateFormattedDateTime(new Date(bag.deliveryDate)),
-      }))
-      .filter((bag) => bag.trackingId === awbnNo);
-    setBagData(newData);
+      }));
+
+    setBagData((prevData) => {
+      const updatedData = [...prevData, ...newData];
+      const uniqueTrackingIds = new Set();
+      let duplicateCount = 0;
+
+      const processedData = updatedData.map((bag) => {
+        if (uniqueTrackingIds.has(bag.trackingId)) {
+          duplicateCount++;
+          return { ...bag, isDuplicate: true };
+        } else {
+          uniqueTrackingIds.add(bag.trackingId);
+          return { ...bag, isDuplicate: false };
+        }
+      });
+
+      setDuplicated(duplicateCount);
+      setValid(uniqueTrackingIds.size);
+
+      return processedData;
+    });
+
+    setAwbnNo("");
+  };
+
+  const removeDuplicate = (trackingId: string) => {
+    setBagData((prevData) => {
+      const indexToRemove = prevData.findIndex(
+        (bag) => bag.trackingId === trackingId && bag.isDuplicate
+      );
+      if (indexToRemove === -1) return prevData;
+
+      const updatedData = [...prevData];
+      updatedData.splice(indexToRemove, 1);
+      setDuplicated((prev) => prev - 1);
+      successDialog("Successfully removed.");
+      return updatedData;
+    });
+  };
+
+  const bagClose = () => {
+    if (window.confirm("Are you sure you want to close this bag?")) {
+      successDialog("Bag going to Pre-Closure");
+    }
   };
 
   return (
@@ -144,7 +191,7 @@ const BaggingAgent = () => {
 
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <div></div>
-        <div style={{ display: "flex", gap: 10, paddingRight: 10 }}>
+        <div style={{ display: "flex", gap: 25, paddingRight: 10 }}>
           <div
             style={{
               display: "flex",
@@ -153,7 +200,7 @@ const BaggingAgent = () => {
             }}
           >
             <span style={{ fontSize: "14px", marginBottom: "8px" }}>Total</span>
-            <span style={{ fontSize: "22px", fontWeight: 600 }}>
+            <span style={{ fontSize: "22px", fontWeight: 600, opacity: 0.8 }}>
               {bagData.length}/40
             </span>
           </div>
@@ -167,7 +214,9 @@ const BaggingAgent = () => {
           >
             <span style={{ fontSize: "14px", marginBottom: "8px" }}>valid</span>
 
-            <span style={{ fontSize: "22px", fontWeight: 600 }}>{valid}</span>
+            <span style={{ fontSize: "22px", fontWeight: 600, opacity: 0.8 }}>
+              {valid}
+            </span>
           </div>
 
           <div
@@ -181,13 +230,15 @@ const BaggingAgent = () => {
               Duplicate
             </span>
 
-            <span style={{ fontSize: "22px", fontWeight: 600 }}>1</span>
+            <span style={{ fontSize: "22px", fontWeight: 600, opacity: 0.8 }}>
+              {duplicated}
+            </span>
           </div>
         </div>
       </Box>
 
       {isBagValid && bagData.length > 0 && (
-        <TableContainer component={Paper}>
+        <TableContainer>
           <Table sx={{ minWidth: 650 }} aria-label="bag data table">
             <TableHead>
               <TableRow>
@@ -196,23 +247,72 @@ const BaggingAgent = () => {
                 <TableCell>Order ID</TableCell>
                 <TableCell>Delivery Date</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {bagData.map((row, rowIndex) => (
-                <TableRow key={row?.trackingId}>
+                <TableRow key={`${row?.trackingId}-${rowIndex}`}>
                   <TableCell>{rowIndex + 1}</TableCell>
                   <TableCell>{row?.trackingId}</TableCell>
                   <TableCell>{row?.orderId}</TableCell>
                   <TableCell>
                     {row?.deliveryDate.split(" ")[0].replace(/,/g, "")}
                   </TableCell>
-                  <TableCell sx={{ color: "green" }}>Valid</TableCell>
+                  <TableCell sx={{ color: row.isDuplicate ? "red" : "green" }}>
+                    {row.isDuplicate ? "Duplicate" : "Valid"}
+                  </TableCell>
+                  <TableCell>
+                    {row.isDuplicate && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        sx={{ fontSize: "10px" }}
+                        onClick={() => removeDuplicate(row.trackingId)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </TableCell>
+                  <TableCell> </TableCell>
+                  <TableCell> </TableCell>
+                  <TableCell> </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+      )}
+
+      {bagData.length > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box></Box>
+
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <FormControlLabel
+              control={<Checkbox />}
+              label="UIC Label"
+              sx={{ "& .MuiFormControlLabel-label": { fontSize: "0.875rem" } }}
+            />
+            <FormControlLabel
+              control={<Checkbox />}
+              label="Sleeves"
+              sx={{ "& .MuiFormControlLabel-label": { fontSize: "0.875rem" } }}
+            />
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              sx={{ fontSize: "10px" }}
+              onClick={bagClose}
+            >
+              Close
+            </Button>
+          </Box>
+        </Box>
       )}
     </Box>
   );
