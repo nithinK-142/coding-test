@@ -36,12 +36,12 @@ export const dashboardItems: DashboardItem[] = [
   //   title: "UC Not Generated",
   //   path: "/",
   // },
-  // {
-  //   icon: <Reorder sx={{ fontSize: "20px" }} />,
-  //   count: 6,
-  //   title: "Assign to BOT",
-  //   path: "/",
-  // },
+  {
+    icon: <Reorder sx={{ fontSize: "20px" }} />,
+    count: 6,
+    title: "Assign to BOT",
+    path: "/",
+  },
   // {
   //   icon: <Assignment sx={{ fontSize: "20px" }} />,
   //   count: 12,

@@ -9,6 +9,7 @@ import axios from "axios";
 export type CountType = {
   orderCount: number;
   deliveryCount: number;
+  botBagscount: number;
 };
 
 const Dashboard = () => {
@@ -17,20 +18,24 @@ const Dashboard = () => {
   const [count, setCount] = useState<CountType>({
     orderCount: 0,
     deliveryCount: 0,
+    botBagscount: 0,
   });
 
   useEffect(() => {
     async function getCountData() {
       try {
-        const [deliveriesResponse, ordersResponse] = await Promise.all([
-          axios.get(import.meta.env.VITE_API_URL + "/delivery/deliveries"),
-          axios.get(import.meta.env.VITE_API_URL + "/order/orders"),
-        ]);
+        const [deliveriesResponse, ordersResponse, botBagsResponse] =
+          await Promise.all([
+            axios.get(import.meta.env.VITE_API_URL + "/delivery/deliveries"),
+            axios.get(import.meta.env.VITE_API_URL + "/order/orders"),
+            axios.get(import.meta.env.VITE_API_URL + "/bot/getBotBags"),
+          ]);
 
         const deliveryCount = deliveriesResponse.data.length;
         const orderCount = ordersResponse.data.length;
+        const botBagscount = botBagsResponse.data.length;
 
-        setCount({ deliveryCount, orderCount });
+        setCount({ deliveryCount, orderCount, botBagscount });
       } catch (error) {
         console.error("Error fetching count data", error);
       }

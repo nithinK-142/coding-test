@@ -224,7 +224,17 @@ export default function Sidebar() {
                 <SubMenu
                   icon={<Assignment style={{ fontSize: "18px" }} />}
                   label="Assign to Agent"
-                ></SubMenu>
+                >
+                  <MenuItem
+                    component={<Link to="/bot" />}
+                    style={{
+                      paddingLeft: "1.2rem",
+                    }}
+                  >
+                    <FiberManualRecord sx={{ fontSize: "0.5rem", mr: 1 }} />
+                    <span>Assign to BOT</span>
+                  </MenuItem>
+                </SubMenu>
                 <SubMenu
                   icon={<SortRounded style={{ fontSize: "18px" }} />}
                   label="Sorting"

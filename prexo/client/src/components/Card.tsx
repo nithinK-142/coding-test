@@ -39,6 +39,8 @@ const Card = ({ dashboardItem, count }: CardProps) => {
             ? count.orderCount || 0
             : dashboardItem.title === "Delivery"
             ? count.deliveryCount || 0
+            : dashboardItem.title === "Assign to BOT"
+            ? count.botBagscount || 0
             : dashboardItem.title}
         </Typography>
 

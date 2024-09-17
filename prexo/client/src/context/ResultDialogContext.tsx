@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
@@ -77,23 +76,19 @@ export const ResultDialogProvider: React.FC<ResultDialogProviderProps> = ({
         TransitionComponent={Transition}
         transitionDuration={500}
         maxWidth="xs"
-        fullWidth
       >
-        <DialogTitle sx={{ textAlign: "center", fontWeight: "bold" }}>
-          {dialogStatus === "success" ? "Success" : "Failure"}
-        </DialogTitle>
         <DialogContent>
           <div style={{ textAlign: "center" }}>
             <img
               src={dialogStatus === "success" ? successSVG : failureSVG}
               alt={dialogStatus === "success" ? "Success" : "Failure"}
-              style={{ width: 50, height: 50, marginBottom: 16 }}
+              style={{ width: 80, height: 80, marginBottom: 16 }}
             />
             <DialogContentText
               sx={{
                 textAlign: "center",
                 fontWeight: "bold",
-                fontSize: "1.2rem",
+                fontSize: "1.1rem",
               }}
             >
               {dialogMessage}
@@ -101,7 +96,12 @@ export const ResultDialogProvider: React.FC<ResultDialogProviderProps> = ({
           </div>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
-          <Button onClick={handleClose} color="primary">
+          <Button
+            onClick={handleClose}
+            color="primary"
+            variant="contained"
+            size="small"
+          >
             Okay
           </Button>
         </DialogActions>

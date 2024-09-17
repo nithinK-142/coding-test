@@ -64,10 +64,10 @@ const BaggingAgent = () => {
         setValid((prev) => prev + 1);
         fetchBagData();
       } else {
-        failureDialog("Bag is Invalid");
+        failureDialog("Bag not found or invalid bagid");
       }
     } catch (error) {
-      failureDialog("Error checking bag");
+      failureDialog("Bag not found or invalid bagid");
       console.log(error);
     }
   };
@@ -91,6 +91,12 @@ const BaggingAgent = () => {
         ...bag,
         deliveryDate: generateFormattedDateTime(new Date(bag.deliveryDate)),
       }));
+
+    if (newData.length === 0) {
+      failureDialog("Order not found or invalid order");
+      setAwbnNo("");
+      return;
+    }
 
     setBagData((prevData) => {
       const updatedData = [...prevData, ...newData];
@@ -131,9 +137,33 @@ const BaggingAgent = () => {
     });
   };
 
-  const bagClose = () => {
+  const bagClose = async () => {
     if (window.confirm("Are you sure you want to close this bag?")) {
-      successDialog("Bag going to Pre-Closure");
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/bot/closeBag`,
+          {
+            bagId,
+            valid,
+            invalid: 0,
+            duplicate: duplicated,
+            total: bagData.length,
+            orders: bagData.map((order) => order.orderId),
+          }
+        );
+
+        if (response.status === 200) {
+          successDialog("Bag going to Pre-Closure");
+          setBagId("");
+          setBagData([]);
+          setValid(0);
+          setDuplicated(0);
+          setIsBagValid(false);
+        }
+      } catch (error) {
+        failureDialog("Error closing bag");
+        console.error("Error closing bag:", error);
+      }
     }
   };
 
@@ -237,24 +267,28 @@ const BaggingAgent = () => {
         </div>
       </Box>
 
-      {isBagValid && bagData.length > 0 && (
-        <TableContainer>
-          <Table sx={{ minWidth: 650 }} aria-label="bag data table">
-            <TableHead>
-              <TableRow>
-                <TableCell>S.No</TableCell>
-                <TableCell>AWBN Number</TableCell>
-                <TableCell>Order ID</TableCell>
-                <TableCell>Delivery Date</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell></TableCell>
-                <TableCell></TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
+      <TableContainer>
+        <Table sx={{ minWidth: 650 }} aria-label="bag data table">
+          <TableHead>
+            <TableRow>
+              <TableCell>S.No</TableCell>
+              <TableCell>AWBN Number</TableCell>
+              <TableCell>Order ID</TableCell>
+              <TableCell>Delivery Date</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+
+          {isBagValid && bagData.length > 0 && (
             <TableBody>
               {bagData.map((row, rowIndex) => (
-                <TableRow key={`${row?.trackingId}-${rowIndex}`}>
+                <TableRow
+                  key={`${row?.trackingId}-${rowIndex}`}
+                  sx={{ position: "relative" }}
+                >
                   <TableCell>{rowIndex + 1}</TableCell>
                   <TableCell>{row?.trackingId}</TableCell>
                   <TableCell>{row?.orderId}</TableCell>
@@ -270,7 +304,13 @@ const BaggingAgent = () => {
                         variant="contained"
                         color="error"
                         size="small"
-                        sx={{ fontSize: "10px" }}
+                        sx={{
+                          fontSize: "10px",
+                          position: "absolute",
+                          right: "10%",
+                          top: "50%",
+                          translate: "-50% -50%",
+                        }}
                         onClick={() => removeDuplicate(row.trackingId)}
                       >
                         Remove
@@ -283,9 +323,9 @@ const BaggingAgent = () => {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+          )}
+        </Table>
+      </TableContainer>
 
       {bagData.length > 0 && (
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
