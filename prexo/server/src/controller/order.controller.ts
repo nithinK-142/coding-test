@@ -35,8 +35,6 @@ export const ordersExists = async (req: Request, res: Response) => {
 
     const allOrdersExist = orderIds.every((id) => existingOrderIds.has(id));
 
-    console.log("All orders exist:", allOrdersExist);
-
     return res.json({
       allOrdersExist,
       existingOrderIds: Array.from(existingOrderIds),

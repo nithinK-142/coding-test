@@ -17,7 +17,6 @@ import axios from "axios";
 import { Check, Close } from "@mui/icons-material";
 import { useResultDialog } from "../context/ResultDialogContext";
 import { Link, useNavigate } from "react-router-dom";
-// import { useOrderSheetUploaded } from "../context/OrderSheetUploadedContext";
 import { formatDateTime } from "../utils";
 
 const orderRequiredFields = [
@@ -52,7 +51,6 @@ export default function Order() {
   const [isValidated, setIsValidated] = useState(false);
   const [showValidate, setShowValidate] = useState(true);
   const { successDialog, failureDialog } = useResultDialog();
-  // const { setOrderSheetUploaded } = useOrderSheetUploaded();
 
   const handleOrderDataUploaded = (uploadedData: OrderData[]) => {
     const dataWithTimestamp = uploadedData.map((row) => ({
@@ -143,7 +141,6 @@ export default function Order() {
         data
       );
       console.log(response);
-      // setOrderSheetUploaded(true);
       navigate("/order");
       successDialog("Data saved successfully.");
     } catch (error) {
