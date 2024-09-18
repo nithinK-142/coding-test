@@ -12,7 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Order from "./pages/Order.tsx";
-import OrderImport from "./pages/Order-Import.tsx";
+import OrderImport from "./pages/OrderImport.tsx";
 import Delivery from "./pages/Delivery.tsx";
 import DeliveryInport from "./pages/Delivery-Import.tsx";
 import { NotFound } from "./pages/NotFound.tsx";
