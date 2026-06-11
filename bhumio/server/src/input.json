@@ -1,0 +1,77 @@
+{
+    "pre_split_deductions": [
+      {
+        "name": "Referral Fee",
+        "type": "percentage",
+        "value": { "min": 0.01, "max": 0.05, "step": 0.01 }
+      },
+      {
+        "name": "Lead Fee",
+        "type": "fixed",
+        "value": 500
+      }
+    ],
+    "post_split_deductions": [
+      {
+        "name": "Transaction Coordinator Fee",
+        "type": "fixed",
+        "value": 300
+      }
+    ],
+    "commission_structure_types": [
+      {
+        "type": "graduated_tiers",
+        "tiers": [
+          {
+            "min_sales_volume": 0,
+            "max_sales_volume": { "min": 500000, "max": 1000000, "step": 100000 },
+            "split_ratio": [80, 20]
+          },
+          {
+            "min_sales_volume": { "min": 500000, "max": 1000000, "step": 100000 },
+            "max_sales_volume": { "min": 1000000, "max": 2000000, "step": 100000 },
+            "split_ratio": [75, 25]
+          },
+          {
+            "min_sales_volume": { "min": 1000000, "max": 2000000, "step": 100000 },
+            "max_sales_volume": null,
+            "split_ratio": [70, 30]
+          }
+        ]
+      }
+    ],
+    "broker_fees": [
+      {
+        "name": "Transaction Fee",
+        "type": "fixed",
+        "value": { "min": 50, "max": 200, "step": 50 }
+      }
+    ],
+    "performance_bonuses": [
+      {
+        "name": "Top Performer Bonus",
+        "criteria": {
+          "kpi": "sales_volume",
+          "threshold": 2000000,
+          "period": "annual"
+        },
+        "value": 5000
+      }
+    ],
+    "sales_data": [
+      { "date": "2024-01-12", "salesValue": 56000 },
+      { "date": "2024-01-15", "salesValue": 45000 },
+      { "date": "2024-02-19", "salesValue": 23000 },
+      { "date": "2024-03-25", "salesValue": 13000 },
+      { "date": "2024-04-29", "salesValue": 45000 },
+      { "date": "2024-06-03", "salesValue": 34000 },
+      { "date": "2024-07-08", "salesValue": 45000 },
+      { "date": "2024-08-12", "salesValue": 33000 },
+      { "date": "2024-08-15", "salesValue": 45000 },
+      { "date": "2024-09-16", "salesValue": 34000 },
+      { "date": "2024-10-21", "salesValue": 35000 },
+      { "date": "2024-11-25", "salesValue": 39000 },
+      { "date": "2024-11-25", "salesValue": 40000 },
+      { "date": "2024-12-30", "salesValue": 41000 }
+    ]
+  }

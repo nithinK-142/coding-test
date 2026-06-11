@@ -1,0 +1,84 @@
+{
+    "pre_split_deductions": [],
+    "post_split_deductions": [],
+    "commission_structure_types": [
+      {
+        "type": "flat_fee",
+        "value": 2000
+      }
+    ],
+    "brokerage_misc_expenses": [],
+    "performance_bonuses": [],
+    "sales_data": [
+      {
+        "date": "2024-01-01",
+        "salesValue": 150000,
+        "cumulativeSales": 150000,
+        "dealType": "Buy Side",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-02",
+        "salesValue": 200000,
+        "cumulativeSales": 350000,
+        "dealType": "Listing",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-03",
+        "salesValue": 100000,
+        "cumulativeSales": 450000,
+        "dealType": "Duel",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-04",
+        "salesValue": 300000,
+        "cumulativeSales": 750000,
+        "dealType": "Rental",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-05",
+        "salesValue": 250000,
+        "cumulativeSales": 1000000,
+        "dealType": "Buy Side",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-06",
+        "salesValue": 180000,
+        "cumulativeSales": 1180000,
+        "dealType": "Listing",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-07",
+        "salesValue": 220000,
+        "cumulativeSales": 1400000,
+        "dealType": "Duel",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-08",
+        "salesValue": 170000,
+        "cumulativeSales": 1570000,
+        "dealType": "Rental",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-09",
+        "salesValue": 190000,
+        "cumulativeSales": 1760000,
+        "dealType": "Buy Side",
+        "commissionPercent": 6
+      },
+      {
+        "date": "2024-01-10",
+        "salesValue": 210000,
+        "cumulativeSales": 1970000,
+        "dealType": "Listing",
+        "commissionPercent": 6
+      }
+    ]
+  }

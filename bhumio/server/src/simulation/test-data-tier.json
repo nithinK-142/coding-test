@@ -1,0 +1,41 @@
+{
+  "pre_split_deductions": [],
+  "post_split_deductions": [],
+  "commission_structure_types": [
+    {
+      "type": "tiered",
+      "tiers": [
+        {
+          "minSalesVolume": 0,
+          "maxSalesVolume": 600000,
+          "agentSplitPercent": 80,
+          "brokerageSplitPercent": 20
+        },
+        {
+          "minSalesVolume": 600000.01,
+          "maxSalesVolume": null,
+          "agentSplitPercent": 75,
+          "brokerageSplitPercent": 25
+        }
+      ]
+    }
+  ],
+  "brokerage_misc_expenses": [],
+  "performance_bonuses": [],
+  "sales_data": [
+    {
+      "date": "2024-01-12",
+      "salesValue": 500000,
+      "cumulativeSales": 0,
+      "dealType": "Listing",
+      "commissionPercent": 6
+    },
+    {
+      "date": "2024-02-01",
+      "salesValue": 200000,
+      "cumulativeSales": 0,
+      "dealType": "Listing",
+      "commissionPercent": 6
+    }
+  ]
+}

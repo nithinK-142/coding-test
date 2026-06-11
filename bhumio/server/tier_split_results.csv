@@ -1,0 +1,3 @@
+Date,Sale Price,Cumulative Sales,Deal Type,Tier,Commission %,Agent Split %,Brokerage Split %,Net Agent Commission,Net Brokerage Commission,Compliance Status
+2024-01-12,500000,500000,Listing,1,6,80,20,24000,6000,Compliant
+2024-02-01,200000,700000,Listing,2,6,75,25,9000,3000,Compliant
